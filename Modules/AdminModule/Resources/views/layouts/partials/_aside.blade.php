@@ -463,6 +463,22 @@ $sidebarLogo = file_exists(base_path('public/assets/login/clean_logo.png'))
                 </li>
             @endcanany
 
+            <li>
+                <a href="{{route('admin.offer-banner.create')}}"
+                    class="{{request()->is('admin/offer-banner/*') ? 'active-menu' : ''}}">
+                    <span class="material-icons" title="{{translate('Offer Banners')}}">local_offer</span>
+                    <span class="link-title">{{translate('Offer Banners')}}</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{route('admin.before-after.create')}}"
+                    class="{{request()->is('admin/before-after/*') ? 'active-menu' : ''}}">
+                    <span class="material-icons" title="{{translate('Before & After')}}">compare</span>
+                    <span class="link-title">{{translate('Before & After')}}</span>
+                </a>
+            </li>
+
             @canany(['push_notification_view', 'push_notification_add', 'notification_message_view', 'notification_message_add', 'notification_message_update', 'notification_channel_view', 'notification_channel_add'])
                 <li class="nav-category" title="{{translate('Notification Management')}}">
                     {{translate('Notification Management')}}
@@ -537,11 +553,11 @@ $sidebarLogo = file_exists(base_path('public/assets/login/clean_logo.png'))
                             </a>
                         </li>
                         <!-- <li>
-                                <a href="{{route('admin.sub-category.create')}}"
-                                    class="{{request()->is('admin/sub-category/*') ? 'active-menu' : ''}}">
-                                    {{translate('Sub Services Setup')}}
-                                </a>
-                            </li> -->
+                                                                <a href="{{route('admin.sub-category.create')}}"
+                                                                    class="{{request()->is('admin/sub-category/*') ? 'active-menu' : ''}}">
+                                                                    {{translate('Sub Services Setup')}}
+                                                                </a>
+                                                            </li> -->
                     </ul>
                 </li>
             @endcanany
@@ -549,8 +565,8 @@ $sidebarLogo = file_exists(base_path('public/assets/login/clean_logo.png'))
                 <li>
                     <a href="{{route('admin.additional-service.index')}}"
                         class="{{request()->is('admin/additional-service/*') ? 'active-menu' : ''}}">
-                        <span class="material-icons" title="{{translate('الخدمات الإضافية')}}">add_to_photos</span>
-                        <span class="link-title">{{translate('الخدمات الإضافية')}}</span>
+                        <span class="material-icons" title="{{translate('Additional Services')}}">add_to_photos</span>
+                        <span class="link-title">{{translate('Additional Services')}}</span>
                     </a>
                 </li>
             @endif
@@ -868,10 +884,8 @@ $sidebarLogo = file_exists(base_path('public/assets/login/clean_logo.png'))
             --}}
 
             @can('blog_view')
-                <li
-                    class="has-sub-item {{request()->is('admin/blog/*') ? 'sub-menu-opened' : ''}}">
-                    <a href="#"
-                        class="{{request()->is('admin/blog/*') ? 'active-menu' : ''}}">
+                <li class="has-sub-item {{request()->is('admin/blog/*') ? 'sub-menu-opened' : ''}}">
+                    <a href="#" class="{{request()->is('admin/blog/*') ? 'active-menu' : ''}}">
                         <span class="material-icons" title="{{translate('Blog')}}">rss_feed</span>
                         <span class="link-title">{{translate('Blog')}}</span>
                     </a>

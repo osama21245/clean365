@@ -44,7 +44,7 @@ class BookingController extends Controller
         $this->offlinePayment = $offlinePayment;
         $this->bookingRepeat = $bookingRepeat;
 
-        $this->isCustomerLoggedIn = (bool)auth('api')->user();
+        $this->isCustomerLoggedIn = (bool) auth('api')->user();
         $this->customerUserId = $this->isCustomerLoggedIn ? auth('api')->user()->id : $request['guest_id'];
     }
 
@@ -55,7 +55,7 @@ class BookingController extends Controller
      */
     public function placeRequest(Request $request): JsonResponse
     {
-        $serviceAtProviderPlace = (int)((business_config('service_at_provider_place', 'provider_config'))->live_values ?? 0);
+        $serviceAtProviderPlace = (int) ((business_config('service_at_provider_place', 'provider_config'))->live_values ?? 0);
 
         $validator = Validator::make($request->all(), [
             'payment_method' => 'required|in:' . implode(',', array_column(PAYMENT_METHODS, 'key')),
@@ -78,13 +78,20 @@ class BookingController extends Controller
                         return;
                     }
 
-                    if (is_null($decoded['lat']) || $decoded['lat'] == '') $fail($attribute . ' must contain "lat" properties.');
-                    if (is_null($decoded['lon']) || $decoded['lon'] == '') $fail($attribute . ' must contain "lon" properties.');
-                    if (is_null($decoded['address']) || $decoded['address'] == '') $fail($attribute . ' must contain "address" properties.');
-                    if (is_null($decoded['contact_person_name']) || $decoded['contact_person_name'] == '') $fail($attribute . ' must contain "contact_person_name" properties.');
-                    if (is_null($decoded['contact_person_number']) || $decoded['contact_person_number'] == '') $fail($attribute . ' must contain "contact_person_number" properties.');
-                    if (is_null($decoded['address_label']) || $decoded['address_label'] == '') $fail($attribute . ' must contain "address_label" properties.');
-                }] : '',
+                    if (is_null($decoded['lat']) || $decoded['lat'] == '')
+                        $fail($attribute . ' must contain "lat" properties.');
+                    if (is_null($decoded['lon']) || $decoded['lon'] == '')
+                        $fail($attribute . ' must contain "lon" properties.');
+                    if (is_null($decoded['address']) || $decoded['address'] == '')
+                        $fail($attribute . ' must contain "address" properties.');
+                    if (is_null($decoded['contact_person_name']) || $decoded['contact_person_name'] == '')
+                        $fail($attribute . ' must contain "contact_person_name" properties.');
+                    if (is_null($decoded['contact_person_number']) || $decoded['contact_person_number'] == '')
+                        $fail($attribute . ' must contain "contact_person_number" properties.');
+                    if (is_null($decoded['address_label']) || $decoded['address_label'] == '')
+                        $fail($attribute . ' must contain "address_label" properties.');
+                }
+            ] : '',
 
             'is_partial' => 'nullable|in:0,1',
             'service_location' => 'required|in:customer,provider',
@@ -92,7 +99,8 @@ class BookingController extends Controller
                 if ($value == 'provider' && $serviceAtProviderPlace != 1) {
                     $fail('The selected service location cannot be "provider" because the service is not available at the provider’s place.');
                 }
-            }]);
+            }
+        ]);
 
         if ($validator->fails()) {
             return response()->json(response_formatter(DEFAULT_400, null, error_processor($validator)), 400);
@@ -110,7 +118,8 @@ class BookingController extends Controller
             $newUserValidator = Validator::make($newUserInfo, [
                 'first_name' => 'required',
                 'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10',
-                'password' => 'required|min:8']);
+                'password' => 'required|min:8'
+            ]);
 
             if ($newUserValidator->fails()) {
                 return response()->json(response_formatter(DEFAULT_400, null, error_processor($newUserValidator)), 400);
@@ -123,7 +132,7 @@ class BookingController extends Controller
             $request['service_address_id'] = $this->add_address(json_decode($request['service_address']), null, !$this->isCustomerLoggedIn, $request->service_location);
         }
 
-        $minimumBookingAmount = (float)(business_config('min_booking_amount', 'booking_setup'))?->live_values;
+        $minimumBookingAmount = (float) (business_config('min_booking_amount', 'booking_setup'))?->live_values;
         $totalBookingAmount = cart_total($customerUserId) + getServiceFee();
 
         if (!isset($request['post_id']) && $minimumBookingAmount > 0 && $totalBookingAmount < $minimumBookingAmount) {
@@ -196,9 +205,9 @@ class BookingController extends Controller
                 }
             }
         } else {
-            if ($request['service_type'] == 'repeat'){
+            if ($request['service_type'] == 'repeat') {
                 $response = $this->placeRepeatBookingRequest($customerUserId, $request, 'cash-payment', newUserInfo: $newUserInfo, isGuest: !$this->isCustomerLoggedIn);
-            }else{
+            } else {
                 $response = $this->placeBookingRequest($customerUserId, $request, 'cash-payment', newUserInfo: $newUserInfo, isGuest: !$this->isCustomerLoggedIn);
             }
         }
@@ -238,9 +247,10 @@ class BookingController extends Controller
 
         $bookings = $this->booking
             ->with([
-                'detail.service' => fn ($q) => $q->withoutGlobalScopes()->withTrashed(),
+                'detail.service' => fn($q) => $q->withoutGlobalScopes()->withTrashed(),
                 'category',
                 'subCategory',
+                'service_address',
             ])
             ->where(['customer_id' => $request->user()->id])
             ->search(base64_decode($request['string'] ?? ''), ['readable_id'])
@@ -256,7 +266,7 @@ class BookingController extends Controller
 
         $bookings->setCollection(
             $bookings->getCollection()->map(
-                fn (Booking $booking) => CustomerBookingPresenter::listItem($booking)
+                fn(Booking $booking) => CustomerBookingPresenter::listItem($booking)
             )
         );
 
@@ -271,7 +281,7 @@ class BookingController extends Controller
         $booking = $this->booking
             ->where(['customer_id' => $request->user()->id])
             ->with([
-                'detail.service' => fn ($q) => $q->withoutGlobalScopes()->withTrashed(),
+                'detail.service' => fn($q) => $q->withoutGlobalScopes()->withTrashed(),
                 'schedule_histories.user',
                 'status_histories.user',
                 'customer',
@@ -333,13 +343,18 @@ class BookingController extends Controller
     public function singleDetails(Request $request, string $id): JsonResponse
     {
         $booking = $this->bookingRepeat->with([
-            'detail.service', 'scheduleHistories.user', 'statusHistories.user', 'booking.customer', 'provider', 'serviceman.user'
+            'detail.service',
+            'scheduleHistories.user',
+            'statusHistories.user',
+            'booking.customer',
+            'provider',
+            'serviceman.user'
         ])->where(['id' => $id])->first();
 
         $booking->booking->service_address = $booking->booking->service_address_location != null ? json_decode($booking->booking->service_address_location) : $booking->booking->service_address;
 
         if (isset($booking)) {
-            if (isset($booking->provider)){
+            if (isset($booking->provider)) {
                 $booking->provider->chatEligibility = chatEligibility($booking->provider_id);
             }
             return response()->json(response_formatter(DEFAULT_200, $booking), 200);
@@ -355,7 +370,8 @@ class BookingController extends Controller
     public function track(Request $request, $id): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'phone' => 'required']);
+            'phone' => 'required'
+        ]);
 
         if ($validator->fails()) {
             return response()->json(response_formatter(DEFAULT_400, null, error_processor($validator)), 400);
@@ -371,7 +387,8 @@ class BookingController extends Controller
 
         unset($booking->service_address_location);
 
-        if (isset($booking)) return response()->json(response_formatter(DEFAULT_200, $booking), 200);
+        if (isset($booking))
+            return response()->json(response_formatter(DEFAULT_200, $booking), 200);
 
         return response()->json(response_formatter(DEFAULT_404, $booking), 404);
     }
@@ -414,7 +431,7 @@ class BookingController extends Controller
 
         $booking = $this->booking
             ->where('readable_id', $readable_id)
-            ->whereHas('service_address', fn ($query) => $query->where('contact_person_number', $request['phone']))
+            ->whereHas('service_address', fn($query) => $query->where('contact_person_number', $request['phone']))
             ->first();
 
         if (!$booking) {
@@ -436,7 +453,8 @@ class BookingController extends Controller
     public function statusUpdate(Request $request, string $booking_id): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'booking_status' => 'required|in:canceled']);
+            'booking_status' => 'required|in:canceled'
+        ]);
 
         if ($validator->fails()) {
             return response()->json(response_formatter(DEFAULT_400, null, error_processor($validator)), 400);
@@ -446,15 +464,15 @@ class BookingController extends Controller
 
         if (isset($booking)) {
 
-            if($booking->booking_status == 'accepted' && $request['booking_status'] == 'canceled'){
+            if ($booking->booking_status == 'accepted' && $request['booking_status'] == 'canceled') {
                 return response()->json(response_formatter(BOOKING_ALREADY_ACCEPTED), 200);
             }
 
-            if($booking->booking_status == 'ongoing' && $request['booking_status'] == 'canceled'){
+            if ($booking->booking_status == 'ongoing' && $request['booking_status'] == 'canceled') {
                 return response()->json(response_formatter(BOOKING_ALREADY_ONGOING), 200);
             }
 
-            if($booking->booking_status == 'completed' && $request['booking_status'] == 'canceled'){
+            if ($booking->booking_status == 'completed' && $request['booking_status'] == 'canceled') {
                 return response()->json(response_formatter(BOOKING_ALREADY_COMPLETED), 200);
             }
 
@@ -469,7 +487,7 @@ class BookingController extends Controller
                 $booking->save();
                 $bookingStatusHistory->save();
 
-                if ($request['booking_status'] == 'canceled' && $booking->repeat->isNotEmpty()){
+                if ($request['booking_status'] == 'canceled' && $booking->repeat->isNotEmpty()) {
                     foreach ($booking->repeat as $repeat) {
                         $repeat->booking_status = 'canceled';
                         $repeat->setAttribute('skipNotification', false);
@@ -498,7 +516,8 @@ class BookingController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'service_schedule' => 'required_without:schedule|date',
-            'schedule' => 'required_without:service_schedule|date']);
+            'schedule' => 'required_without:service_schedule|date'
+        ]);
 
         if ($validator->fails()) {
             return response()->json(response_formatter(DEFAULT_400, null, error_processor($validator)), 400);
@@ -515,9 +534,12 @@ class BookingController extends Controller
         }
 
         if (!in_array($booking->booking_status, ['pending', 'accepted'], true)) {
-            return response()->json(response_formatter(DEFAULT_400, null, [[
-                'code' => 'booking_status',
-                'message' => translate('Only pending or accepted bookings can be rescheduled')]]), 400);
+            return response()->json(response_formatter(DEFAULT_400, null, [
+                [
+                    'code' => 'booking_status',
+                    'message' => translate('Only pending or accepted bookings can be rescheduled')
+                ]
+            ]), 400);
         }
 
         $booking->service_schedule = date('Y-m-d H:i:s', strtotime($schedule));
@@ -548,10 +570,9 @@ class BookingController extends Controller
         $bookingId = $repeat->booking_id;
         $booking = $this->booking->where('id', $bookingId)->where('customer_id', $customerId)->first();
 
-        if ($booking && $repeat)
-        {
+        if ($booking && $repeat) {
             $statusCheck = $repeat->booking_status == 'canceled';
-            if ($statusCheck){
+            if ($statusCheck) {
                 return response()->json(response_formatter(BOOKING_ALREADY_CANCELED_200), 200);
             }
 
@@ -575,7 +596,8 @@ class BookingController extends Controller
             'offline_payment_id' => 'required',
             'customer_information' => 'required',
             'booking_id' => 'required',
-            'is_partial' => 'required|in:0,1']);
+            'is_partial' => 'required|in:0,1'
+        ]);
 
         if ($validator->fails()) {
             return response()->json(response_formatter(DEFAULT_400, null, error_processor($validator)), 400);
@@ -593,7 +615,7 @@ class BookingController extends Controller
         }
 
         $fields = array_column($offlinePaymentData->customer_information, 'field_name');
-        $customerInformation = (array)json_decode(base64_decode($request['customer_information']))[0];
+        $customerInformation = (array) json_decode(base64_decode($request['customer_information']))[0];
 
         foreach ($fields as $field) {
             if (!key_exists($field, $customerInformation)) {
@@ -618,14 +640,16 @@ class BookingController extends Controller
                 'booking_id' => $booking->id,
                 'paid_with' => 'wallet',
                 'paid_amount' => $paidAmount,
-                'due_amount' => $dueAmount]);
+                'due_amount' => $dueAmount
+            ]);
 
             // Save remaining payment
             BookingPartialPayment::create([
                 'booking_id' => $booking->id,
                 'paid_with' => 'offline_payment',
                 'paid_amount' => $dueAmount,
-                'due_amount' => 0]);
+                'due_amount' => 0
+            ]);
 
             placeBookingTransactionForPartialDigital($booking);
         }
@@ -633,7 +657,7 @@ class BookingController extends Controller
         // Check if the booking_id already exists
         $existingPayment = BookingOfflinePayment::where('booking_id', $request->booking_id)->first();
 
-        $customerInformation = (array)json_decode(base64_decode($request['customer_information']))[0];
+        $customerInformation = (array) json_decode(base64_decode($request['customer_information']))[0];
 
         if ($existingPayment) {
             // If it exists, update with new data
@@ -665,7 +689,8 @@ class BookingController extends Controller
             'payment_method' => 'required',
             'offline_payment_id' => 'required_if:payment_method,offline_payment',
             'customer_information' => 'required_if:payment_method,offline_payment',
-            'is_partial' => 'required|in:0,1']);
+            'is_partial' => 'required|in:0,1'
+        ]);
 
         if ($validator->fails()) {
             return response()->json(response_formatter(DEFAULT_400, null, error_processor($validator)), 400);
@@ -694,14 +719,16 @@ class BookingController extends Controller
                 'booking_id' => $booking->id,
                 'paid_with' => 'wallet',
                 'paid_amount' => $paidAmount,
-                'due_amount' => $dueAmount]);
+                'due_amount' => $dueAmount
+            ]);
 
             // Save remaining payment
             BookingPartialPayment::create([
                 'booking_id' => $booking->id,
                 'paid_with' => 'digital',
                 'paid_amount' => $dueAmount,
-                'due_amount' => 0]);
+                'due_amount' => 0
+            ]);
         }
 
         // Handle payment method updates
@@ -721,8 +748,7 @@ class BookingController extends Controller
             $booking->update(['payment_method' => 'wallet_payment', 'transaction_id' => 'wallet-payment']);
             placeBookingTransactionForWalletPayment($booking);
 
-        }
-        else {
+        } else {
             return response()->json(response_formatter(DEFAULT_400, null, 'Invalid payment method.'), 400);
         }
 
@@ -732,7 +758,8 @@ class BookingController extends Controller
     public function digitalPaymentBookingResponse(Request $request): JsonResponse|array
     {
         $validator = Validator::make($request->all(), [
-            'transaction_id' => 'required']);
+            'transaction_id' => 'required'
+        ]);
 
         if ($validator->fails()) {
             return response()->json(response_formatter(DEFAULT_400, null, error_processor($validator)), 400);
@@ -758,7 +785,7 @@ class BookingController extends Controller
         }
 
         $loginToken = null;
-        if ($register_new_customer == 1 && $new_user_phone != null){
+        if ($register_new_customer == 1 && $new_user_phone != null) {
             $user = new User();
             $user->first_name = $additional_data['first_name'];
             $user->last_name = '';
@@ -777,11 +804,12 @@ class BookingController extends Controller
             $loginToken = $user->createToken('CUSTOMER_PANEL_ACCESS')->accessToken;
         }
 
-        $response =  [
+        $response = [
             'booking_id' => $booking_id,
             'booking_repeat_id' => $booking_repeat_id,
             'new_user_phone' => $new_user_phone,
-            'login_token' => $loginToken];
+            'login_token' => $loginToken
+        ];
 
         return response()->json(response_formatter(DEFAULT_200, $response), 200);
 

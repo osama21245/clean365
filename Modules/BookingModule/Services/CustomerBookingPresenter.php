@@ -88,7 +88,7 @@ class CustomerBookingPresenter
 
         if ($booking->subscription_id) {
             $subscription = CustomerServiceSubscription::query()
-                ->with(['service' => fn ($q) => $q->withoutGlobalScopes()->withTrashed()])
+                ->with(['service' => fn($q) => $q->withoutGlobalScopes()->withTrashed()])
                 ->find($booking->subscription_id);
             if ($subscription?->service?->name) {
                 return (string) $subscription->service->name;
@@ -102,9 +102,14 @@ class CustomerBookingPresenter
 
     public static function listItem(Booking $booking): array
     {
-        $booking->loadMissing(['detail.service', 'subCategory', 'category']);
+        $booking->loadMissing(['detail.service', 'subCategory', 'category', 'service_address']);
         $field = self::fieldStatusMeta($booking->field_status);
         $packageName = self::packageName($booking);
+
+        $address = $booking->service_address
+            ?? (is_string($booking->service_address_location)
+                ? json_decode($booking->service_address_location)
+                : $booking->service_address_location);
 
         return [
             'id' => $booking->id,
@@ -127,6 +132,8 @@ class CustomerBookingPresenter
             'subscription_id' => $booking->subscription_id,
             'team_id' => $booking->team_id,
             'is_repeated' => (int) ($booking->is_repeated ?? 0),
+            'address' => $address,
+            'service_address' => $address,
             'created_at' => $booking->created_at,
             'updated_at' => $booking->updated_at,
         ];
@@ -149,11 +156,10 @@ class CustomerBookingPresenter
         $field = self::fieldStatusMeta($booking->field_status);
         $packageName = self::packageName($booking);
 
-        $address = $booking->service_address_location
-            ? (is_string($booking->service_address_location)
+        $address = $booking->service_address
+            ?? (is_string($booking->service_address_location)
                 ? json_decode($booking->service_address_location)
-                : $booking->service_address_location)
-            : $booking->service_address;
+                : $booking->service_address_location);
 
         $coords = self::coordsFromAddress($address);
 
@@ -195,6 +201,8 @@ class CustomerBookingPresenter
             'sub_category_name' => $booking->subCategory?->name,
             'subscription_id' => $booking->subscription_id,
             'services' => $services,
+            'address' => $address,
+            'service_address' => $address,
             'location' => [
                 'text' => is_object($address)
                     ? ($address->address ?? $address->address_label ?? null)

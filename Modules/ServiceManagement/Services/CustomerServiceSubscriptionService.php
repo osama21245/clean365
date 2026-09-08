@@ -190,9 +190,6 @@ class CustomerServiceSubscriptionService
         $booking->loadMissing(['detail', 'service_address']);
 
         $propertyId = $booking->service_address?->property_id;
-        if (!$propertyId) {
-            return;
-        }
 
         $serviceIds = $booking->detail->pluck('service_id')->filter()->unique()->values();
         if ($serviceIds->isEmpty()) {
@@ -209,23 +206,29 @@ class CustomerServiceSubscriptionService
         }
     }
 
-    public static function consumeOneVisit(string $userId, string $serviceId, string $propertyId, string $bookingId): bool
+    public static function consumeOneVisit(string $userId, string $serviceId, ?string $propertyId, string $bookingId): bool
     {
         if (CustomerServiceSubscriptionVisit::where('booking_id', $bookingId)->where('service_id', $serviceId)->exists()) {
             return false;
         }
 
         return DB::transaction(function () use ($userId, $serviceId, $propertyId, $bookingId) {
-            /** @var CustomerServiceSubscription|null $subscription */
-            $subscription = CustomerServiceSubscription::query()
+            $query = CustomerServiceSubscription::query()
                 ->where([
                     'user_id' => $userId,
                     'service_id' => $serviceId,
-                    'property_id' => $propertyId,
                     'status' => 'active'
-                ])
-                ->lockForUpdate()
-                ->first();
+                ]);
+
+            if (!empty($propertyId)) {
+                $query->where(function ($q) use ($propertyId) {
+                    $q->where('property_id', $propertyId)
+                        ->orWhereNull('property_id');
+                });
+            }
+
+            /** @var CustomerServiceSubscription|null $subscription */
+            $subscription = $query->lockForUpdate()->first();
 
             if (!$subscription || $subscription->remaining_visits < 1) {
                 return false;

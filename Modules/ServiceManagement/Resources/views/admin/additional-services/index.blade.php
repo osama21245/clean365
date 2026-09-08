@@ -1,6 +1,6 @@
 @extends('adminmodule::layouts.master')
 
-@section('title', translate('الخدمات الإضافية'))
+@section('title', translate('Additional Services'))
 
 @push('css_or_js')
     <style>
@@ -38,7 +38,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="page-title-wrap mb-3 d-flex align-items-center justify-content-between">
-                    <h2 class="page-title">{{ translate('الخدمات الإضافية') }}</h2>
+                    <h2 class="page-title">{{ translate('Additional Services') }}</h2>
                 </div>
 
                 {{-- Create Form Card --}}

@@ -29,8 +29,6 @@ class BeforeAfterController extends Controller
      */
     public function create(Request $request): View|Factory|Application
     {
-        $this->authorize('before_after_view');
-
         $search = $request->has('search') ? $request['search'] : '';
         $status = $request->has('status') ? $request['status'] : 'all';
         $queryParam = ['search' => $search, 'status' => $status];
@@ -55,13 +53,8 @@ class BeforeAfterController extends Controller
         return view('promotionmanagement::admin.before-after.create', compact('items', 'search', 'status'));
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function store(Request $request): RedirectResponse
     {
-        $this->authorize('before_after_add');
-
         $check = $this->validateUploadedFile($request, ['before_image', 'after_image']);
         if ($check !== true) {
             return $check;
@@ -71,7 +64,8 @@ class BeforeAfterController extends Controller
             'title' => 'required|string|max:190',
             'sort_order' => 'nullable|integer|min:0',
             'before_image' => 'required|image|max:' . uploadMaxFileSizeInKB('image') . '|mimes:' . implode(',', array_column(IMAGEEXTENSION, 'key')),
-            'after_image' => 'required|image|max:' . uploadMaxFileSizeInKB('image') . '|mimes:' . implode(',', array_column(IMAGEEXTENSION, 'key'))]);
+            'after_image' => 'required|image|max:' . uploadMaxFileSizeInKB('image') . '|mimes:' . implode(',', array_column(IMAGEEXTENSION, 'key'))
+        ]);
 
         $item = $this->beforeAfter;
         $item->title = $request['title'];
@@ -85,12 +79,8 @@ class BeforeAfterController extends Controller
         return back();
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function edit(string $id): View|Factory|Application|RedirectResponse
     {
-        $this->authorize('before_after_update');
         $item = $this->beforeAfter->where('id', $id)->first();
 
         if (!$item) {
@@ -101,13 +91,8 @@ class BeforeAfterController extends Controller
         return view('promotionmanagement::admin.before-after.edit', compact('item'));
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function update(Request $request, string $id): RedirectResponse
     {
-        $this->authorize('before_after_update');
-
         $check = $this->validateUploadedFile($request, ['before_image', 'after_image']);
         if ($check !== true) {
             return $check;
@@ -117,7 +102,8 @@ class BeforeAfterController extends Controller
             'title' => 'required|string|max:190',
             'sort_order' => 'nullable|integer|min:0',
             'before_image' => 'nullable|image|max:' . uploadMaxFileSizeInKB('image') . '|mimes:' . implode(',', array_column(IMAGEEXTENSION, 'key')),
-            'after_image' => 'nullable|image|max:' . uploadMaxFileSizeInKB('image') . '|mimes:' . implode(',', array_column(IMAGEEXTENSION, 'key'))]);
+            'after_image' => 'nullable|image|max:' . uploadMaxFileSizeInKB('image') . '|mimes:' . implode(',', array_column(IMAGEEXTENSION, 'key'))
+        ]);
 
         $item = $this->beforeAfter->where('id', $id)->first();
         if (!$item) {
@@ -135,12 +121,8 @@ class BeforeAfterController extends Controller
         return redirect()->route('admin.before-after.create');
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function destroy(string $id): RedirectResponse
     {
-        $this->authorize('before_after_delete');
         $item = $this->beforeAfter->where('id', $id)->first();
 
         if ($item) {
@@ -153,12 +135,8 @@ class BeforeAfterController extends Controller
         return back();
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function statusUpdate(string $id): JsonResponse
     {
-        $this->authorize('before_after_manage_status');
         $item = $this->beforeAfter->where('id', $id)->first();
 
         if (!$item) {

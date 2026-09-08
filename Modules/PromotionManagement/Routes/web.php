@@ -44,6 +44,15 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Web\Admin',
         Route::any('download', [BannerController::class, 'download'])->name('download');
     });
 
+    Route::group(['prefix' => 'offer-banner', 'as' => 'offer-banner.'], function () {
+        Route::any('create', [\Modules\PromotionManagement\Http\Controllers\Web\Admin\OfferBannerController::class, 'create'])->name('create');
+        Route::post('store', [\Modules\PromotionManagement\Http\Controllers\Web\Admin\OfferBannerController::class, 'store'])->name('store');
+        Route::get('edit/{id}', [\Modules\PromotionManagement\Http\Controllers\Web\Admin\OfferBannerController::class, 'edit'])->name('edit');
+        Route::put('update/{id}', [\Modules\PromotionManagement\Http\Controllers\Web\Admin\OfferBannerController::class, 'update'])->name('update');
+        Route::any('status-update/{id}', [\Modules\PromotionManagement\Http\Controllers\Web\Admin\OfferBannerController::class, 'statusUpdate'])->name('status-update');
+        Route::delete('delete/{id}', [\Modules\PromotionManagement\Http\Controllers\Web\Admin\OfferBannerController::class, 'destroy'])->name('delete');
+    });
+
     Route::group(['prefix' => 'before-after', 'as' => 'before-after.'], function () {
         Route::any('create', [BeforeAfterController::class, 'create'])->name('create');
         Route::post('store', [BeforeAfterController::class, 'store'])->name('store');

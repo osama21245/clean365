@@ -52,6 +52,10 @@ Route::group(['prefix' => 'customer', 'as' => 'customer.', 'namespace' => 'Api\V
         Route::get('/', [BannerController::class, 'index']);
     });
 
+    Route::group(['prefix' => 'offer-banner', 'as' => 'offer-banner.'], function () {
+        Route::get('/', [\Modules\PromotionManagement\Http\Controllers\Api\V1\Customer\OfferBannerController::class, 'index']);
+    });
+
     Route::group(['prefix' => 'before-after', 'as' => 'before-after.'], function () {
         Route::get('/', [BeforeAfterController::class, 'index']);
     });
