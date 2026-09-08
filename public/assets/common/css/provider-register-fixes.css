@@ -1,0 +1,33 @@
+.global-image-upload {
+    position: relative !important;
+}
+
+.global-image-upload input[type="file"] {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.global-image-upload input[type="file"]:focus,
+.global-image-upload input[type="file"]:focus-visible {
+    outline: none;
+}
+
+#register-vertical-steps label.error {
+    display: block;
+    color: var(--bs-danger, #dc3545);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+#register-vertical-steps .global-multi-image-warning label.error {
+    margin-top: 0.5rem;
+}

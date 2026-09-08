@@ -1,0 +1,26 @@
+/*
+ * ff-field-date-fix.css
+ *
+ * Overrides the transparent background produced by the global
+ * `input[type="date"] { background: url(...) ... }` rule in
+ * admin-module/css/style.css (specificity 0,1,1) so that date inputs
+ * rendered through the `_form-field` partial use the same
+ * background token as every other input.
+ *
+ * Selector specificity: (0,2,1) via the .ff-field--date / .ff-field--datetime-local
+ * wrapper class + the input type attribute. Higher than the existing
+ * style.css rule so the calendar-icon background-image is preserved
+ * while only `background-color` is overridden.
+ */
+
+.ff-field--date .ff-field__input[type="date"],
+.ff-field--datetime-local .ff-field__input[type="datetime-local"] {
+    background-color: var(--ff-bg);
+}
+
+.ff-field--date .ff-field__input[type="date"]:disabled,
+.ff-field--date .ff-field__input[type="date"][readonly],
+.ff-field--datetime-local .ff-field__input[type="datetime-local"]:disabled,
+.ff-field--datetime-local .ff-field__input[type="datetime-local"][readonly] {
+    background-color: var(--ff-bg-disabled);
+}

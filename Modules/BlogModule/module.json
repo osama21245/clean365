@@ -1,0 +1,13 @@
+{
+    "name": "BlogModule",
+    "alias": "blogmodule",
+    "description": "AI blog automation and articles",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\BlogModule\\Providers\\BlogModuleServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

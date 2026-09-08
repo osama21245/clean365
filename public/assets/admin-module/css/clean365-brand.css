@@ -1,0 +1,660 @@
+/**
+ * Clean 365 — Admin Dashboard Brand Identity
+ * Navy blue + fresh green, aligned with public landing page.
+ */
+
+:root,
+[data-bs-theme="light"] {
+    /* Brand core */
+    --c365-navy: #1b3a6b;
+    --c365-navy-dark: #0f2440;
+    --c365-navy-mid: #254a82;
+    --c365-green: #2ead6f;
+    --c365-green-dark: #24945c;
+    --c365-green-light: #e8f8f0;
+    --c365-surface: #f4f7fa;
+    --c365-border: #dde6f0;
+
+    /* Override template tokens */
+    --bs-primary: var(--c365-navy);
+    --bs-primary-dark: #152f55;
+    --bs-primary-light: #e8eef6;
+    --bs-primary-rgb: 27, 58, 107;
+    --bs-primary-light-bg: rgba(27, 58, 107, 0.06);
+
+    --bs-success: var(--c365-green);
+    --bs-success-dark: var(--c365-green-dark);
+    --bs-success-light: var(--c365-green-light);
+
+    --bg-color: var(--c365-surface);
+    --bg-color2: #e9eff6;
+    --bg-color4: #fafbfd;
+    --bs-body-bg: var(--c365-surface);
+    --border-color: var(--c365-border);
+    --bs-border-color: var(--c365-border);
+    --input-border-color-active: rgba(27, 58, 107, 0.35);
+
+    --bs-font-sans-serif: "Plus Jakarta Sans", "IBM Plex Sans Arabic", "Public Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+[data-bs-theme="dark"] {
+    --c365-navy: #3d6db5;
+    --c365-navy-dark: #0a1628;
+    --c365-green: #3cc980;
+    --bs-primary: #4a7ec4;
+    --bs-primary-dark: #3565a8;
+    --bs-primary-rgb: 74, 126, 196;
+    --bs-primary-light-bg: rgba(74, 126, 196, 0.12);
+    --bs-success: var(--c365-green);
+}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.aside {
+    background: linear-gradient(180deg, var(--c365-navy-dark) 0%, var(--c365-navy) 55%, #1e4278 100%);
+    border-inline-end: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.aside-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.aside-header .toggle-menu-button,
+.aside-header .aside-toggle {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.aside .user-profile .card-title {
+    color: #fff !important;
+    font-weight: 600;
+}
+
+.aside .user-profile .card-text {
+    color: rgba(255, 255, 255, 0.55) !important;
+    text-transform: capitalize;
+    font-size: 0.75rem;
+}
+
+.aside-body .nav li.nav-category {
+    color: rgba(255, 255, 255, 0.4) !important;
+    letter-spacing: 0.06em;
+    font-size: 0.6875rem;
+}
+
+.aside-body .nav li > a {
+    color: rgba(255, 255, 255, 0.78);
+    border-radius: 0.625rem;
+    padding: 0.5rem 0.625rem;
+    margin: 0 -0.625rem;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.aside-body .nav li > a:hover,
+.aside-body .nav li:hover > a {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.aside-body .nav li > a .material-icons {
+    font-size: 1.25rem;
+    opacity: 0.9;
+}
+
+.aside-body .nav li .link-title .count {
+    background-color: var(--c365-green);
+    font-weight: 600;
+    min-width: 1.375rem;
+    text-align: center;
+}
+
+.aside-body .nav li.has-sub-item:after {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.aside-body .nav ul.sub-menu li > a {
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.aside-body .nav ul.sub-menu li > a:hover,
+.aside-body .nav ul.sub-menu li > a.active-menu {
+    color: #fff;
+}
+
+.active-menu {
+    color: #fff !important;
+    background: rgba(46, 173, 111, 0.22) !important;
+    box-shadow: inset 3px 0 0 var(--c365-green);
+    font-weight: 600;
+}
+
+.aside-body .nav li.active > a {
+    color: #fff;
+}
+
+/* Folded sidebar hover */
+body.aside-folded .aside-body li:hover i,
+body.aside-folded.open-aside-folded .aside-body li:hover i {
+    color: var(--c365-green) !important;
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+.header {
+    background: #fff;
+    border-bottom: 1px solid var(--c365-border);
+    box-shadow: 0 1px 8px rgba(15, 36, 64, 0.06);
+}
+
+[data-bs-theme="dark"] .header {
+    background: var(--bs-white);
+    border-bottom-color: var(--border-color);
+}
+
+.header .toggle-menu-button,
+.header .aside-toggle {
+    color: var(--c365-navy) !important;
+}
+
+/* ── Main area ───────────────────────────────────────────── */
+.main-area {
+    background: var(--c365-surface);
+}
+
+[data-bs-theme="dark"] .main-area {
+    background: var(--bs-body-bg);
+}
+
+.page-title {
+    color: var(--c365-navy);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+}
+
+[data-bs-theme="dark"] .page-title {
+    color: var(--bs-dark);
+}
+
+/* ── Cards ───────────────────────────────────────────────── */
+.card {
+    border: 1px solid var(--c365-border);
+    box-shadow: 0 2px 12px rgba(15, 36, 64, 0.04);
+}
+
+.card-header {
+    background: transparent;
+    border-bottom-color: var(--c365-border);
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn--primary,
+.btn--primary[disabled] {
+    background: linear-gradient(135deg, var(--c365-navy) 0%, var(--c365-navy-mid) 100%);
+    border: none;
+    box-shadow: 0 2px 8px rgba(27, 58, 107, 0.25);
+    font-weight: 500;
+    color: #fff;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn--primary:hover,
+.btn--primary:focus {
+    background: linear-gradient(135deg, var(--c365-navy-mid) 0%, var(--c365-navy) 100%);
+    box-shadow: 0 4px 14px rgba(27, 58, 107, 0.32);
+    transform: translateY(-1px);
+    color: #fff;
+}
+
+/* Wizard step actions (provider/service create & edit) */
+.wizard .actions ul a[href="#next"],
+.wizard .actions ul a[href="#finish"] {
+    background: linear-gradient(135deg, var(--c365-navy) 0%, var(--c365-navy-mid) 100%) !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(27, 58, 107, 0.25);
+    color: #fff !important;
+    font-weight: 500;
+}
+
+.wizard .actions ul a[href="#next"]:hover,
+.wizard .actions ul a[href="#next"]:focus,
+.wizard .actions ul a[href="#finish"]:hover,
+.wizard .actions ul a[href="#finish"]:focus {
+    background: linear-gradient(135deg, var(--c365-navy-mid) 0%, var(--c365-navy) 100%) !important;
+    box-shadow: 0 4px 14px rgba(27, 58, 107, 0.32);
+    color: #fff !important;
+    transform: translateY(-1px);
+}
+
+.wizard .actions ul a[href="#cancel"],
+.wizard .actions ul a[href="#previous"] {
+    background: #eef2f7 !important;
+    color: var(--c365-navy) !important;
+    border: 1px solid var(--c365-border) !important;
+    box-shadow: none !important;
+    font-weight: 500;
+}
+
+.wizard .actions ul a[href="#cancel"]:hover,
+.wizard .actions ul a[href="#cancel"]:focus,
+.wizard .actions ul a[href="#previous"]:hover,
+.wizard .actions ul a[href="#previous"]:focus {
+    background: #e2e8f0 !important;
+    color: var(--c365-navy) !important;
+    transform: none;
+}
+
+.wizard .actions ul li.disabled a,
+.wizard .actions ul li.disabled a[href="#previous"] {
+    background: #eef2f7 !important;
+    color: rgba(27, 58, 107, 0.42) !important;
+    opacity: 1 !important;
+    box-shadow: none !important;
+    pointer-events: none;
+}
+
+.btn--success {
+    background: linear-gradient(135deg, var(--c365-green) 0%, var(--c365-green-dark) 100%);
+    box-shadow: 0 2px 8px rgba(46, 173, 111, 0.28);
+    font-weight: 500;
+}
+
+.btn--success:hover {
+    background: linear-gradient(135deg, var(--c365-green-dark) 0%, #1f7a4a 100%);
+}
+
+.btn--secondary-two {
+    background-color: var(--bs-primary-light-bg);
+    color: var(--c365-navy);
+    border: 1px solid rgba(27, 58, 107, 0.15);
+}
+
+.btn-outline--primary:hover {
+    color: var(--c365-navy) !important;
+    border-color: var(--c365-navy) !important;
+    background: var(--bs-primary-light-bg);
+}
+
+/* ── Color utilities ─────────────────────────────────────── */
+.c1 {
+    color: var(--c365-navy) !important;
+}
+
+.c1-bg {
+    background-color: var(--c365-navy) !important;
+}
+
+.c2,
+.c2-bg {
+    color: var(--c365-green) !important;
+}
+
+.c2-bg {
+    background-color: var(--c365-green) !important;
+}
+
+.c1-light-bg {
+    background-color: var(--bs-primary-light-bg);
+}
+
+/* ── Tabs ────────────────────────────────────────────────── */
+.nav--tabs .nav-link.active {
+    border-color: var(--c365-navy);
+    color: var(--c365-navy);
+}
+
+.nav--tabs.border-color-primary .nav-link.active {
+    border-color: var(--c365-navy);
+    color: var(--c365-navy);
+}
+
+.nav--tabs__style2 .nav-link.active {
+    background: linear-gradient(135deg, var(--c365-navy) 0%, var(--c365-navy-mid) 100%);
+    color: #fff;
+    border-radius: 0.5rem;
+}
+
+.nav--tabs__style3 {
+    border-block-end-color: var(--c365-navy);
+}
+
+.nav--tabs__style3 .nav-link.active {
+    background-color: var(--c365-navy);
+}
+
+/* ── Dashboard stat cards ────────────────────────────────── */
+.business-summary,
+.statistics-card {
+    border-radius: 0.875rem;
+    box-shadow: 0 4px 20px rgba(15, 36, 64, 0.12);
+}
+
+.business-summary-customers {
+    background: linear-gradient(135deg, var(--c365-navy-dark) 0%, var(--c365-navy) 100%);
+}
+
+.business-summary-earning,
+.business-summary {
+    background: linear-gradient(135deg, var(--c365-green-dark) 0%, var(--c365-green) 100%);
+}
+
+.business-summary-providers {
+    background: linear-gradient(135deg, #1a5080 0%, #2a6fad 100%);
+}
+
+.business-summary-services {
+    background: linear-gradient(135deg, var(--c365-navy) 0%, #2d5f9a 100%);
+}
+
+.statistics-card h2 {
+    color: var(--c365-navy);
+}
+
+.statistics-card__primary h2 {
+    color: var(--c365-navy);
+}
+
+.statistics-card__ongoing h2 {
+    color: var(--c365-green);
+}
+
+/* ── Forms ───────────────────────────────────────────────── */
+.form-control:focus,
+.form-select:focus,
+.theme-input-style:focus {
+    border-color: var(--c365-navy);
+    box-shadow: 0 0 0 0.2rem rgba(27, 58, 107, 0.12);
+}
+
+.select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+    background-color: var(--c365-navy);
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: var(--bs-primary-light-bg);
+    border-color: rgba(27, 58, 107, 0.2);
+    color: var(--c365-navy);
+}
+
+/* ── Tables ──────────────────────────────────────────────── */
+.table thead th {
+    color: var(--c365-navy);
+    font-weight: 600;
+    border-bottom-color: var(--c365-border);
+    background: rgba(27, 58, 107, 0.03);
+}
+
+.table-hover > tbody > tr:hover {
+    background-color: rgba(27, 58, 107, 0.03);
+}
+
+/* ── Pagination ──────────────────────────────────────────── */
+.pagination li a.active,
+.pagination li span.active {
+    background-color: var(--c365-navy);
+    border-color: var(--c365-navy);
+}
+
+/* ── Badges & alerts ─────────────────────────────────────── */
+.badge.bg-primary {
+    background-color: var(--c365-navy) !important;
+}
+
+/* Solid primary surfaces only — do not override Bootstrap opacity utilities */
+.bg-primary:not([class*="bg-opacity-"]) {
+    background-color: rgba(var(--bs-primary-rgb), var(--bs-bg-opacity, 1)) !important;
+}
+
+.badge.bg-success {
+    background-color: var(--c365-green) !important;
+    color: #fff !important;
+}
+
+.alert--message-2 {
+    border-inline-start: 4px solid var(--c365-green);
+}
+
+/* ── Preloader ───────────────────────────────────────────── */
+.preloader::after {
+    border-color: var(--c365-navy);
+    border-top-color: transparent;
+}
+
+/* ── Settings sidebar ────────────────────────────────────── */
+.settings-sidebar .setting-box.active,
+.settings-sidebar .setting-box:hover {
+    border-color: var(--c365-navy);
+}
+
+/* ── Links (main content only — never sidebar or wizard actions) ── */
+.main-area a:not(.btn):not(.nav-link):not(.page-link):not(.btn-link):not([role="menuitem"]),
+.header a:not(.btn):not(.nav-link):not(.page-link):not(.btn-link):not([role="menuitem"]) {
+    color: var(--c365-navy);
+}
+
+.main-area a:not(.btn):not(.nav-link):not(.page-link):not(.btn-link):not([role="menuitem"]):hover,
+.header a:not(.btn):not(.nav-link):not(.page-link):not(.btn-link):not([role="menuitem"]):hover {
+    color: var(--c365-green-dark);
+}
+
+.link-color {
+    color: var(--c365-navy) !important;
+}
+
+.border-color-primary {
+    border-color: var(--c365-navy) !important;
+}
+
+/* ── Scrollbar (sidebar) ─────────────────────────────────── */
+.aside-body .ps__thumb-y {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.footer {
+    color: rgba(27, 58, 107, 0.55);
+    border-top: 1px solid var(--c365-border);
+    padding-top: 1rem;
+}
+
+/* ── Dark mode sidebar stays branded ─────────────────────── */
+[data-bs-theme="dark"] .aside {
+    background: linear-gradient(180deg, #0a1628 0%, #122240 100%);
+}
+
+[data-bs-theme="dark"] .active-menu {
+    background: rgba(60, 201, 128, 0.18) !important;
+}
+
+/* ── Badges ──────────────────────────────────────────────── */
+.badge-primary,
+.badge.badge-primary {
+    background-color: var(--c365-navy) !important;
+    color: #fff;
+}
+
+.badge-success,
+.badge.badge-success {
+    background-color: var(--c365-green) !important;
+    color: #fff !important;
+}
+
+/* ── Links & actions ─────────────────────────────────────── */
+.btn-link {
+    color: var(--c365-navy);
+    font-weight: 600;
+}
+
+.btn-link:hover {
+    color: var(--c365-green-dark);
+}
+
+/* ── Toggle switch ───────────────────────────────────────── */
+.switcher_input:checked ~ .switcher_control {
+    background-color: var(--c365-green);
+}
+
+/* ── Dropdowns ───────────────────────────────────────────── */
+.dropdown-item.active,
+.dropdown-item:active {
+    background-color: var(--c365-navy);
+}
+
+/* ── Modals ──────────────────────────────────────────────── */
+.modal-header {
+    border-bottom-color: var(--c365-border);
+}
+
+.modal-header .modal-title {
+    color: var(--c365-navy);
+    font-weight: 700;
+}
+
+/* ── Progress & booking stats ────────────────────────────── */
+.progress-bar {
+    background-color: var(--c365-green);
+}
+
+.booking-statistics-info .progress-bar {
+    background: linear-gradient(90deg, var(--c365-navy), var(--c365-green));
+}
+
+/* ── Information boxes ───────────────────────────────────── */
+.information-details-box {
+    border: 1px solid var(--c365-border);
+}
+
+.information-details-box__title.c1 {
+    color: var(--c365-navy) !important;
+}
+
+/* ── Search modal trigger ──────────────────────────────────── */
+#modalOpener.bg--secondary {
+    background: var(--bs-primary-light-bg) !important;
+    border: 1px solid var(--c365-border) !important;
+}
+
+#modalOpener:hover {
+    border-color: var(--c365-navy) !important;
+}
+
+/* ── Toastr (success uses green) ─────────────────────────── */
+#toast-container > .toast-success {
+    background-color: var(--c365-green);
+}
+
+/* ── Data table & empty states ───────────────────────────── */
+.data-table-top {
+    border-bottom-color: var(--c365-border);
+}
+
+/* ── RTL sidebar active indicator flip ───────────────────── */
+[dir="rtl"] .active-menu {
+    box-shadow: inset -3px 0 0 var(--c365-green);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Critical UI fixes — sidebar contrast & modern shell
+   ═══════════════════════════════════════════════════════════ */
+
+/* Sidebar: force light text (overrides global link + .c1 + .dark-color) */
+.aside .dark-color,
+.aside-header .dark-color,
+.aside-header .toggle-menu-button,
+.aside-header .aside-toggle,
+.aside-header .aside-toggle .material-icons {
+    color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.aside-body .nav li.nav-category {
+    color: rgba(255, 255, 255, 0.45) !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.06em;
+    padding-top: 0.75rem;
+}
+
+.aside-body .nav > li > a,
+.aside-body .nav ul.sub-menu li > a {
+    color: rgba(255, 255, 255, 0.88) !important;
+    font-weight: 400 !important;
+    font-size: 0.8125rem;
+}
+
+.aside-body .nav > li > a .material-icons,
+.aside-body .nav > li > a .link-title,
+.aside-body .nav ul.sub-menu li > a .link-title {
+    color: inherit !important;
+}
+
+.aside-body .nav > li > a:hover,
+.aside-body .nav ul.sub-menu li > a:hover,
+.aside-body .nav li:hover > a {
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.aside-body .nav li > a.active-menu,
+.aside-body .nav ul.sub-menu li > a.active-menu,
+.aside-body .nav li.active > a,
+.aside-body .nav li.sub-menu-opened > a.active-menu {
+    color: #fff !important;
+    background: rgba(46, 173, 111, 0.22) !important;
+    box-shadow: inset 3px 0 0 var(--c365-green);
+    font-weight: 500 !important;
+}
+
+.aside-body .nav li.has-sub-item:after {
+    color: rgba(255, 255, 255, 0.45) !important;
+}
+
+.aside-body .nav li .link-title .count {
+    background: var(--c365-green) !important;
+    color: #fff !important;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(46, 173, 111, 0.35);
+}
+
+.aside .user-profile .card-title,
+.aside .user-profile .card-text {
+    color: #fff !important;
+}
+
+.aside .user-profile .card-text {
+    color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* Stat cards — always white text on gradients */
+.business-summary,
+.business-summary h2,
+.business-summary h3,
+.business-summary .material-icons,
+.c365-stat-grid .business-summary,
+.c365-stat-grid .business-summary h2,
+.c365-stat-grid .business-summary h3 {
+    color: #fff !important;
+}
+
+.business-summary-customers {
+    background: linear-gradient(135deg, #0f2440 0%, #1b3a6b 55%, #254a82 100%) !important;
+}
+
+.business-summary-earning {
+    background: linear-gradient(135deg, #1f8f58 0%, #2ead6f 50%, #3cc980 100%) !important;
+}
+
+.business-summary-providers {
+    background: linear-gradient(135deg, #1a5080 0%, #2a6fad 55%, #3d8fd4 100%) !important;
+}
+
+.business-summary-services {
+    background: linear-gradient(135deg, #152f55 0%, #1b3a6b 45%, #2d5f9a 100%) !important;
+}
+
+/* Main shell */
+.main-area {
+    background: linear-gradient(180deg, #f8fafc 0%, var(--c365-surface) 120px);
+}
+
+.header {
+    background: rgba(255, 255, 255, 0.97) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}

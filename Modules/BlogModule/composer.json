@@ -1,0 +1,16 @@
+{
+    "name": "nwidart/blogmodule",
+    "description": "AI blog automation",
+    "authors": [],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\BlogModule\\": ""
+        }
+    }
+}

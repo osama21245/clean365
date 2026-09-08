@@ -1,0 +1,3609 @@
+{
+  "info": {
+    "_postman_id": "clean365-supervisor-mobile-v2",
+    "name": "Clean365 — Supervisor App",
+    "description": "# Clean365 Supervisor App API\n\nFolders match the mobile tabs:\n1. Auth\n2. Home (ops dashboard)\n3. Teams\n4. Bookings / assigned jobs\n5. Profile\n\nClient location always includes `lat` + `lng` in `location` and `coordinates`.\nAdmin-only actions (create team/task, accept booking) are **not** in this collection.\n",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.clean365.sa",
+      "type": "string"
+    },
+    {
+      "key": "supervisor_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "serviceman_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "supervisor_email",
+      "value": "v_j@hotmail.com",
+      "type": "string"
+    },
+    {
+      "key": "supervisor_password",
+      "value": "password123",
+      "type": "string"
+    },
+    {
+      "key": "serviceman_phone",
+      "value": "+201000000001",
+      "type": "string"
+    },
+    {
+      "key": "serviceman_password",
+      "value": "password123",
+      "type": "string"
+    },
+    {
+      "key": "team_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "booking_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "task_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "serviceman_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "check_in_latitude",
+      "value": "24.8301",
+      "type": "string"
+    },
+    {
+      "key": "check_in_longitude",
+      "value": "46.7056",
+      "type": "string"
+    },
+    {
+      "key": "fcm_token",
+      "value": "SAMPLE_FCM_TOKEN",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 — Auth",
+      "description": "Login first. Token is saved to `supervisor_token`.",
+      "item": [
+        {
+          "name": "Supervisor Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Body: `email_or_phone`, `password`, `type`.\nSaves `supervisor_token`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email_or_phone\": \"{{supervisor_email}}\",\n  \"password\": \"{{supervisor_password}}\",\n  \"type\": \"email\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "if (j.content?.token) pm.collectionVariables.set('supervisor_token', j.content.token);"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Login Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"auth_login_200\",\n  \"message\": \"successfully logged in\",\n  \"content\": {\n    \"token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiYWJjZGVm...\",\n    \"is_active\": 1\n  },\n  \"errors\": []\n}"
+            },
+            {
+              "name": "401 Wrong Password",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"auth_login_401\",\n  \"message\": \"user credential does not match\",\n  \"content\": null,\n  \"errors\": []\n}"
+            },
+            {
+              "name": "404 User Not Found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"auth_login_404\",\n  \"message\": \"User does not exist\",\n  \"content\": null,\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Supervisor Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "user",
+                "logout"
+              ]
+            },
+            "description": "Revoke supervisor token."
+          },
+          "response": [
+            {
+              "name": "200 Logout",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/user/logout",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "user",
+                    "logout"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"auth_logout_200\",\n  \"message\": \"successfully logged out\",\n  \"content\": null,\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Serviceman Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Field worker login. Saves `serviceman_token`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{serviceman_phone}}\",\n  \"password\": \"{{serviceman_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j=pm.response.json(); if(j.content?.token) pm.collectionVariables.set('serviceman_token', j.content.token);"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Login Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/serviceman/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "serviceman",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"auth_login_200\",\n  \"message\": \"successfully logged in\",\n  \"content\": {\n    \"token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIyIiwianRpIjoiZ2hpamts...\",\n    \"is_active\": 1\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 — Home",
+      "description": "Home tab: today summary, team preview, active/upcoming jobs.\n\n`GET /provider/ops/dashboard`",
+      "item": [
+        {
+          "name": "Home Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "dashboard"
+              ]
+            },
+            "description": "Today cards (completed / upcoming / in progress / total %) + teams_preview + active_jobs + upcoming_jobs.\nEach job includes `location.text`, `location.lat`, `location.lng`."
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/dashboard",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "dashboard"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"today_summary\": {\n      \"total\": 12,\n      \"completed\": 3,\n      \"upcoming\": 5,\n      \"in_progress\": 4,\n      \"progress_percent\": 25,\n      \"date\": \"2026-06-27\"\n    },\n    \"teams_preview\": [\n      {\n        \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n        \"name\": \"Team 1\",\n        \"is_active\": true,\n        \"status\": \"on_the_way\",\n        \"technicians_count\": 3,\n        \"members\": [\n          {\n            \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n            \"name\": \"Khaled Ahmed\",\n            \"phone\": \"+966500000002\",\n            \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n          },\n          {\n            \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n            \"name\": \"Sami Ali\",\n            \"phone\": \"+966500000001\",\n            \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n          },\n          {\n            \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n            \"name\": \"Ahmed Hassan\",\n            \"phone\": \"+966500000003\",\n            \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n          }\n        ],\n        \"current_job\": {\n          \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n          \"readable_id\": \"CLN-2458\",\n          \"title\": \"Deep Cleaning\",\n          \"field_status\": \"in_progress\",\n          \"booking_status\": \"ongoing\",\n          \"package_label\": \"Monthly package\",\n          \"progress_percent\": 65,\n          \"tasks_summary\": {\n            \"completed\": 2,\n            \"total\": 3\n          },\n          \"attendance\": {\n            \"attended\": 3,\n            \"total\": 3\n          },\n          \"schedule_at\": \"2026-06-27 16:00:00\",\n          \"customer\": {\n            \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n            \"name\": \"Abdulrahman Jamil\",\n            \"phone\": \"+966551234567\"\n          },\n          \"property_type\": \"Apartment\",\n          \"location_text\": \"An Narjis District, Riyadh\",\n          \"location\": {\n            \"text\": \"An Narjis District, Riyadh\",\n            \"lat\": 24.8301,\n            \"lng\": 46.7056\n          },\n          \"coordinates\": {\n            \"lat\": 24.8301,\n            \"lng\": 46.7056\n          },\n          \"team\": {\n            \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n            \"name\": \"Team 2\",\n            \"members_count\": 3,\n            \"members\": [\n              {\n                \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n                \"name\": \"Sami Ali\",\n                \"phone\": \"+966500000001\",\n                \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n              },\n              {\n                \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n                \"name\": \"Khaled Ahmed\",\n                \"phone\": \"+966500000002\",\n                \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n              },\n              {\n                \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n                \"name\": \"Ahmed Hassan\",\n                \"phone\": \"+966500000003\",\n                \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n              }\n            ]\n          }\n        }\n      },\n      {\n        \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n        \"name\": \"Team 1\",\n        \"is_active\": true,\n        \"status\": \"in_progress\",\n        \"technicians_count\": 3,\n        \"members\": [\n          {\n            \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n            \"name\": \"Khaled Ahmed\",\n            \"phone\": \"+966500000002\",\n            \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n          },\n          {\n            \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n            \"name\": \"Sami Ali\",\n            \"phone\": \"+966500000001\",\n            \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n          },\n          {\n            \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n            \"name\": \"Ahmed Hassan\",\n            \"phone\": \"+966500000003\",\n            \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n          }\n        ],\n        \"current_job\": {\n          \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n          \"readable_id\": \"CLN-2458\",\n          \"title\": \"Deep Cleaning\",\n          \"field_status\": \"in_progress\",\n          \"booking_status\": \"ongoing\",\n          \"package_label\": \"Monthly package\",\n          \"progress_percent\": 65,\n          \"tasks_summary\": {\n            \"completed\": 2,\n            \"total\": 3\n          },\n          \"attendance\": {\n            \"attended\": 3,\n            \"total\": 3\n          },\n          \"schedule_at\": \"2026-06-27 16:00:00\",\n          \"customer\": {\n            \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n            \"name\": \"Abdulrahman Jamil\",\n            \"phone\": \"+966551234567\"\n          },\n          \"property_type\": \"Apartment\",\n          \"location_text\": \"An Narjis District, Riyadh\",\n          \"location\": {\n            \"text\": \"An Narjis District, Riyadh\",\n            \"lat\": 24.8301,\n            \"lng\": 46.7056\n          },\n          \"coordinates\": {\n            \"lat\": 24.8301,\n            \"lng\": 46.7056\n          },\n          \"team\": {\n            \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n            \"name\": \"Team 2\",\n            \"members_count\": 3,\n            \"members\": [\n              {\n                \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n                \"name\": \"Sami Ali\",\n                \"phone\": \"+966500000001\",\n                \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n              },\n              {\n                \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n                \"name\": \"Khaled Ahmed\",\n                \"phone\": \"+966500000002\",\n                \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n              },\n              {\n                \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n                \"name\": \"Ahmed Hassan\",\n                \"phone\": \"+966500000003\",\n                \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n              }\n            ]\n          }\n        }\n      },\n      {\n        \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n        \"name\": \"Team 3\",\n        \"is_active\": true,\n        \"status\": \"available\",\n        \"technicians_count\": 2,\n        \"members\": [\n          {\n            \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n            \"name\": \"Khaled Ahmed\",\n            \"phone\": \"+966500000002\",\n            \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n          },\n          {\n            \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n            \"name\": \"Sami Ali\",\n            \"phone\": \"+966500000001\",\n            \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n          },\n          {\n            \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n            \"name\": \"Ahmed Hassan\",\n            \"phone\": \"+966500000003\",\n            \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n          }\n        ],\n        \"current_job\": null\n      }\n    ],\n    \"active_jobs\": [\n      {\n        \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n        \"readable_id\": \"CLN-2458\",\n        \"title\": \"Deep Cleaning\",\n        \"field_status\": \"on_the_way\",\n        \"booking_status\": \"accepted\",\n        \"package_label\": \"Monthly package\",\n        \"progress_percent\": 10,\n        \"tasks_summary\": {\n          \"completed\": 2,\n          \"total\": 3\n        },\n        \"attendance\": {\n          \"attended\": 3,\n          \"total\": 3\n        },\n        \"schedule_at\": \"2026-06-27 16:00:00\",\n        \"customer\": {\n          \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n          \"name\": \"Abdulrahman Jamil\",\n          \"phone\": \"+966551234567\"\n        },\n        \"property_type\": \"Apartment\",\n        \"location_text\": \"An Narjis District, Riyadh\",\n        \"location\": {\n          \"text\": \"An Narjis District, Riyadh\",\n          \"lat\": 24.8301,\n          \"lng\": 46.7056\n        },\n        \"coordinates\": {\n          \"lat\": 24.8301,\n          \"lng\": 46.7056\n        },\n        \"team\": {\n          \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n          \"name\": \"Team 2\",\n          \"members_count\": 3,\n          \"members\": [\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n              \"name\": \"Sami Ali\",\n              \"phone\": \"+966500000001\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            },\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n              \"name\": \"Khaled Ahmed\",\n              \"phone\": \"+966500000002\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            },\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n              \"name\": \"Ahmed Hassan\",\n              \"phone\": \"+966500000003\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            }\n          ]\n        }\n      },\n      {\n        \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n        \"readable_id\": \"CLN-2458\",\n        \"title\": \"Deep Cleaning\",\n        \"field_status\": \"in_progress\",\n        \"booking_status\": \"ongoing\",\n        \"package_label\": \"Monthly package\",\n        \"progress_percent\": 65,\n        \"tasks_summary\": {\n          \"completed\": 2,\n          \"total\": 3\n        },\n        \"attendance\": {\n          \"attended\": 3,\n          \"total\": 3\n        },\n        \"schedule_at\": \"2026-06-27 16:00:00\",\n        \"customer\": {\n          \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n          \"name\": \"Abdulrahman Jamil\",\n          \"phone\": \"+966551234567\"\n        },\n        \"property_type\": \"Apartment\",\n        \"location_text\": \"An Narjis District, Riyadh\",\n        \"location\": {\n          \"text\": \"An Narjis District, Riyadh\",\n          \"lat\": 24.8301,\n          \"lng\": 46.7056\n        },\n        \"coordinates\": {\n          \"lat\": 24.8301,\n          \"lng\": 46.7056\n        },\n        \"team\": {\n          \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n          \"name\": \"Team 2\",\n          \"members_count\": 3,\n          \"members\": [\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n              \"name\": \"Sami Ali\",\n              \"phone\": \"+966500000001\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            },\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n              \"name\": \"Khaled Ahmed\",\n              \"phone\": \"+966500000002\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            },\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n              \"name\": \"Ahmed Hassan\",\n              \"phone\": \"+966500000003\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            }\n          ]\n        }\n      }\n    ],\n    \"upcoming_jobs\": [\n      {\n        \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n        \"readable_id\": \"CLN-2458\",\n        \"title\": \"Deep Cleaning\",\n        \"field_status\": \"assigned\",\n        \"booking_status\": \"accepted\",\n        \"package_label\": \"Monthly package\",\n        \"progress_percent\": 0,\n        \"tasks_summary\": {\n          \"completed\": 2,\n          \"total\": 3\n        },\n        \"attendance\": {\n          \"attended\": 3,\n          \"total\": 3\n        },\n        \"schedule_at\": \"2026-06-27 16:00:00\",\n        \"customer\": {\n          \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n          \"name\": \"Abdulrahman Jamil\",\n          \"phone\": \"+966551234567\"\n        },\n        \"property_type\": \"Apartment\",\n        \"location_text\": \"An Narjis District, Riyadh\",\n        \"location\": {\n          \"text\": \"An Narjis District, Riyadh\",\n          \"lat\": 24.8301,\n          \"lng\": 46.7056\n        },\n        \"coordinates\": {\n          \"lat\": 24.8301,\n          \"lng\": 46.7056\n        },\n        \"team\": {\n          \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n          \"name\": \"Team 2\",\n          \"members_count\": 3,\n          \"members\": [\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n              \"name\": \"Sami Ali\",\n              \"phone\": \"+966500000001\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            },\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n              \"name\": \"Khaled Ahmed\",\n              \"phone\": \"+966500000002\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            },\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n              \"name\": \"Ahmed Hassan\",\n              \"phone\": \"+966500000003\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            }\n          ]\n        }\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Home Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/notifications",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "notifications"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Required"
+                },
+                {
+                  "key": "offset",
+                  "value": "1",
+                  "description": "Required"
+                }
+              ]
+            },
+            "description": "Bell list.\n**Query:** `limit`, `offset`."
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/notifications",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "notifications"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"current_page\": 1,\n    \"data\": [\n      {\n        \"id\": \"notif-001\",\n        \"title\": \"New booking assigned\",\n        \"description\": \"Booking #CLN-2458 is pending acceptance in your zone.\",\n        \"to_users\": [\n          \"provider-admin\"\n        ],\n        \"zone_ids\": [\n          \"c9d0e1f2-a3b4-5678-2345-789012345678\"\n        ],\n        \"cover_image_full_path\": null,\n        \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n      }\n    ],\n    \"first_page_url\": \"/api/v1/provider/notifications?offset=1\",\n    \"from\": 1,\n    \"last_page\": 1,\n    \"last_page_url\": \"/api/v1/provider/notifications?offset=1\",\n    \"links\": [\n      {\n        \"url\": null,\n        \"label\": \"&laquo; Previous\",\n        \"active\": false\n      },\n      {\n        \"url\": \"/api/v1/provider/notifications?offset=1\",\n        \"label\": \"1\",\n        \"active\": true\n      },\n      {\n        \"url\": null,\n        \"label\": \"Next &raquo;\",\n        \"active\": false\n      }\n    ],\n    \"next_page_url\": null,\n    \"path\": \"/api/v1/provider/notifications\",\n    \"per_page\": 10,\n    \"prev_page_url\": null,\n    \"to\": 1,\n    \"total\": 1\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 — Teams",
+      "description": "Teams tab.\n\n| Screen | Endpoint |\n|--------|----------|\n| Summary + list | `GET /provider/ops/teams` |\n| Team follow-up | `GET /provider/ops/teams/{id}` |\n| Team CRUD view | `GET /provider/team/` |\n| Members | `GET /provider/serviceman/` |\n\nCurrent job on a team includes `location.lat` / `location.lng`.",
+      "item": [
+        {
+          "name": "Teams List + Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/teams",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "teams"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Required"
+                },
+                {
+                  "key": "offset",
+                  "value": "1",
+                  "description": "Required"
+                },
+                {
+                  "key": "status",
+                  "value": "all",
+                  "description": "all|available|on_the_way|in_progress|unavailable"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Team or member name"
+                }
+              ]
+            },
+            "description": "UI chips: إجمالي / متاح / قيد التنفيذ / في الطريق.\nQuery: `limit`, `offset`, `status` (`all|available|on_the_way|in_progress|unavailable`), `search`."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j=pm.response.json();",
+                  "const t=j.content?.teams?.data?.[0]||j.content?.teams?.[0];",
+                  "if(t?.id) pm.collectionVariables.set('team_id', t.id);"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/teams",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "teams"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"summary\": {\n      \"total\": 6,\n      \"available\": 2,\n      \"in_progress\": 3,\n      \"on_the_way\": 1,\n      \"unavailable\": 0\n    },\n    \"teams\": {\n      \"data\": [\n        {\n          \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n          \"name\": \"Team 1\",\n          \"is_active\": true,\n          \"status\": \"in_progress\",\n          \"technicians_count\": 3,\n          \"members\": [\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n              \"name\": \"Khaled Ahmed\",\n              \"phone\": \"+966500000002\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            },\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n              \"name\": \"Sami Ali\",\n              \"phone\": \"+966500000001\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            },\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n              \"name\": \"Ahmed Hassan\",\n              \"phone\": \"+966500000003\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            }\n          ],\n          \"current_job\": {\n            \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n            \"readable_id\": \"CLN-2458\",\n            \"title\": \"Deep Cleaning\",\n            \"field_status\": \"in_progress\",\n            \"booking_status\": \"ongoing\",\n            \"package_label\": \"Monthly package\",\n            \"progress_percent\": 65,\n            \"tasks_summary\": {\n              \"completed\": 2,\n              \"total\": 3\n            },\n            \"attendance\": {\n              \"attended\": 3,\n              \"total\": 3\n            },\n            \"schedule_at\": \"2026-06-27 16:00:00\",\n            \"customer\": {\n              \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n              \"name\": \"Abdulrahman Jamil\",\n              \"phone\": \"+966551234567\"\n            },\n            \"property_type\": \"Apartment\",\n            \"location_text\": \"An Narjis District, Riyadh\",\n            \"location\": {\n              \"text\": \"An Narjis District, Riyadh\",\n              \"lat\": 24.8301,\n              \"lng\": 46.7056\n            },\n            \"coordinates\": {\n              \"lat\": 24.8301,\n              \"lng\": 46.7056\n            },\n            \"team\": {\n              \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n              \"name\": \"Team 2\",\n              \"members_count\": 3,\n              \"members\": [\n                {\n                  \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n                  \"name\": \"Sami Ali\",\n                  \"phone\": \"+966500000001\",\n                  \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n                },\n                {\n                  \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n                  \"name\": \"Khaled Ahmed\",\n                  \"phone\": \"+966500000002\",\n                  \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n                },\n                {\n                  \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n                  \"name\": \"Ahmed Hassan\",\n                  \"phone\": \"+966500000003\",\n                  \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n                }\n              ]\n            }\n          }\n        },\n        {\n          \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n          \"name\": \"Team 1\",\n          \"is_active\": true,\n          \"status\": \"available\",\n          \"technicians_count\": 3,\n          \"members\": [\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n              \"name\": \"Khaled Ahmed\",\n              \"phone\": \"+966500000002\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            },\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n              \"name\": \"Sami Ali\",\n              \"phone\": \"+966500000001\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            },\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n              \"name\": \"Ahmed Hassan\",\n              \"phone\": \"+966500000003\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            }\n          ],\n          \"current_job\": null\n        },\n        {\n          \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n          \"name\": \"Team 1\",\n          \"is_active\": true,\n          \"status\": \"on_the_way\",\n          \"technicians_count\": 3,\n          \"members\": [\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n              \"name\": \"Khaled Ahmed\",\n              \"phone\": \"+966500000002\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            },\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n              \"name\": \"Sami Ali\",\n              \"phone\": \"+966500000001\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            },\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n              \"name\": \"Ahmed Hassan\",\n              \"phone\": \"+966500000003\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n            }\n          ],\n          \"current_job\": {\n            \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n            \"readable_id\": \"CLN-2458\",\n            \"title\": \"Deep Cleaning\",\n            \"field_status\": \"in_progress\",\n            \"booking_status\": \"ongoing\",\n            \"package_label\": \"Monthly package\",\n            \"progress_percent\": 65,\n            \"tasks_summary\": {\n              \"completed\": 2,\n              \"total\": 3\n            },\n            \"attendance\": {\n              \"attended\": 3,\n              \"total\": 3\n            },\n            \"schedule_at\": \"2026-06-27 16:00:00\",\n            \"customer\": {\n              \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n              \"name\": \"Abdulrahman Jamil\",\n              \"phone\": \"+966551234567\"\n            },\n            \"property_type\": \"Apartment\",\n            \"location_text\": \"An Narjis District, Riyadh\",\n            \"location\": {\n              \"text\": \"An Narjis District, Riyadh\",\n              \"lat\": 24.8301,\n              \"lng\": 46.7056\n            },\n            \"coordinates\": {\n              \"lat\": 24.8301,\n              \"lng\": 46.7056\n            },\n            \"team\": {\n              \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n              \"name\": \"Team 2\",\n              \"members_count\": 3,\n              \"members\": [\n                {\n                  \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n                  \"name\": \"Sami Ali\",\n                  \"phone\": \"+966500000001\",\n                  \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n                },\n                {\n                  \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n                  \"name\": \"Khaled Ahmed\",\n                  \"phone\": \"+966500000002\",\n                  \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n                },\n                {\n                  \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n                  \"name\": \"Ahmed Hassan\",\n                  \"phone\": \"+966500000003\",\n                  \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n                }\n              ]\n            }\n          }\n        }\n      ],\n      \"total\": 3,\n      \"limit\": 10,\n      \"offset\": 1\n    }\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Team Detail / Follow-up",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/teams/{{team_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "teams",
+                "{{team_id}}"
+              ]
+            },
+            "description": "Members, attendance, current_job with client location lat/lng."
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/teams/{id}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "teams",
+                    "{id}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n    \"name\": \"Team 1\",\n    \"is_active\": true,\n    \"status\": \"in_progress\",\n    \"technicians_count\": 3,\n    \"members\": [\n      {\n        \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n        \"name\": \"Khaled Ahmed\",\n        \"phone\": \"+966500000002\",\n        \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n      },\n      {\n        \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n        \"name\": \"Sami Ali\",\n        \"phone\": \"+966500000001\",\n        \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n      },\n      {\n        \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n        \"name\": \"Ahmed Hassan\",\n        \"phone\": \"+966500000003\",\n        \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n      }\n    ],\n    \"current_job\": {\n      \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n      \"readable_id\": \"CLN-2458\",\n      \"title\": \"Deep Cleaning\",\n      \"field_status\": \"in_progress\",\n      \"booking_status\": \"ongoing\",\n      \"package_label\": \"Monthly package\",\n      \"progress_percent\": 65,\n      \"tasks_summary\": {\n        \"completed\": 2,\n        \"total\": 3\n      },\n      \"attendance\": {\n        \"attended\": 3,\n        \"total\": 3\n      },\n      \"schedule_at\": \"2026-06-27 16:00:00\",\n      \"customer\": {\n        \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n        \"name\": \"Abdulrahman Jamil\",\n        \"phone\": \"+966551234567\"\n      },\n      \"property_type\": \"Apartment\",\n      \"location_text\": \"An Narjis District, Riyadh\",\n      \"location\": {\n        \"text\": \"An Narjis District, Riyadh\",\n        \"lat\": 24.8301,\n        \"lng\": 46.7056\n      },\n      \"coordinates\": {\n        \"lat\": 24.8301,\n        \"lng\": 46.7056\n      },\n      \"team\": {\n        \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n        \"name\": \"Team 2\",\n        \"members_count\": 3,\n        \"members\": [\n          {\n            \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n            \"name\": \"Sami Ali\",\n            \"phone\": \"+966500000001\",\n            \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n          },\n          {\n            \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n            \"name\": \"Khaled Ahmed\",\n            \"phone\": \"+966500000002\",\n            \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n          },\n          {\n            \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n            \"name\": \"Ahmed Hassan\",\n            \"phone\": \"+966500000003\",\n            \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n          }\n        ],\n        \"attendance\": {\n          \"attended\": 3,\n          \"total\": 3\n        }\n      },\n      \"customer_note\": \"Please focus on cleaning the kitchen and bathrooms, and ensure surfaces are sanitized.\",\n      \"field_status_timeline\": [\n        \"assigned\",\n        \"on_the_way\",\n        \"arrived\",\n        \"in_progress\",\n        \"completed\"\n      ],\n      \"photos\": {\n        \"before\": [\n          \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n          \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n          \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n        ],\n        \"during\": [\n          \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n          \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n        ],\n        \"after\": [],\n        \"counts\": {\n          \"before\": 3,\n          \"during\": 2,\n          \"after\": 0\n        }\n      },\n      \"execution_notes\": [\n        {\n          \"id\": \"note-001\",\n          \"note\": \"Started kitchen and bathroom cleaning; work is on plan.\",\n          \"user_id\": \"b2c3d4e5-f6a7-8901-bcde-f12345678901\",\n          \"user_name\": \"Mohamed Ali\",\n          \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n        }\n      ],\n      \"tasks\": [\n        {\n          \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123456\",\n          \"title\": \"Kitchen deep clean\",\n          \"status\": \"completed\",\n          \"attendees_count\": 2\n        },\n        {\n          \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123457\",\n          \"title\": \"Bathrooms sanitize\",\n          \"status\": \"in_progress\",\n          \"attendees_count\": 2\n        },\n        {\n          \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123458\",\n          \"title\": \"Living room wipe\",\n          \"status\": \"pending\",\n          \"attendees_count\": 1\n        }\n      ]\n    }\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Teams (setup)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/team/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "team"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": ""
+                },
+                {
+                  "key": "offset",
+                  "value": "1",
+                  "description": ""
+                },
+                {
+                  "key": "status",
+                  "value": "all",
+                  "description": ""
+                }
+              ]
+            },
+            "description": "Lean teams + `assigned_bookings` (each with location lat/lng)."
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/team/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "team"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"current_page\": 1,\n    \"data\": [\n      {\n        \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n        \"name\": \"Morning Cleaning Crew\",\n        \"is_active\": true,\n        \"members_count\": 2,\n        \"members\": [\n          {\n            \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n            \"name\": \"Ahmed Hassan\",\n            \"phone\": \"+201000000001\",\n            \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n            \"is_active\": 1\n          },\n          {\n            \"id\": \"d5e6f7a8-b9c0-1234-def0-345678901234\",\n            \"name\": \"Sara Mahmoud\",\n            \"phone\": \"+201000000002\",\n            \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n            \"is_active\": 1\n          }\n        ]\n      }\n    ],\n    \"first_page_url\": \"/api/v1/provider/team?offset=1\",\n    \"from\": 1,\n    \"last_page\": 1,\n    \"last_page_url\": \"/api/v1/provider/team?offset=1\",\n    \"links\": [\n      {\n        \"url\": null,\n        \"label\": \"&laquo; Previous\",\n        \"active\": false\n      },\n      {\n        \"url\": \"/api/v1/provider/team?offset=1\",\n        \"label\": \"1\",\n        \"active\": true\n      },\n      {\n        \"url\": null,\n        \"label\": \"Next &raquo;\",\n        \"active\": false\n      }\n    ],\n    \"next_page_url\": null,\n    \"path\": \"/api/v1/provider/team\",\n    \"per_page\": 10,\n    \"prev_page_url\": null,\n    \"to\": 1,\n    \"total\": 1\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Team (setup)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/team/{{team_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "team",
+                "{{team_id}}"
+              ]
+            },
+            "description": "Team members + assigned bookings."
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/team/{id}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "team",
+                    "{id}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n    \"name\": \"Morning Cleaning Crew\",\n    \"is_active\": true,\n    \"members_count\": 2,\n    \"members\": [\n      {\n        \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n        \"name\": \"Ahmed Hassan\",\n        \"phone\": \"+201000000001\",\n        \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n        \"is_active\": 1\n      },\n      {\n        \"id\": \"d5e6f7a8-b9c0-1234-def0-345678901234\",\n        \"name\": \"Sara Mahmoud\",\n        \"phone\": \"+201000000002\",\n        \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n        \"is_active\": 1\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Servicemen",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/serviceman/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "serviceman"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Required"
+                },
+                {
+                  "key": "offset",
+                  "value": "1",
+                  "description": "Required"
+                },
+                {
+                  "key": "status",
+                  "value": "all",
+                  "description": ""
+                }
+              ]
+            },
+            "description": "View-only member list."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j=pm.response.json();",
+                  "const row=j.content?.data?.[0];",
+                  "if(row?.serviceman_id) pm.collectionVariables.set('serviceman_id', row.serviceman_id);"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/serviceman/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "serviceman"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"current_page\": 1,\n    \"data\": [\n      {\n        \"id\": \"d4e5f6a7-b8c9-0123-def0-234567890123\",\n        \"first_name\": \"Ahmed\",\n        \"last_name\": \"Hassan\",\n        \"full_name\": \"Ahmed Hassan\",\n        \"email\": \"ahmed.hassan@clean365.tech\",\n        \"phone\": \"+201000000001\",\n        \"profile_image_full_path\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n        \"is_active\": 1,\n        \"serviceman_id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n        \"user_id\": \"d4e5f6a7-b8c9-0123-def0-234567890123\",\n        \"provider_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n        \"user_type\": \"provider-serviceman\"\n      }\n    ],\n    \"first_page_url\": \"/api/v1/provider/serviceman?offset=1\",\n    \"from\": 1,\n    \"last_page\": 1,\n    \"last_page_url\": \"/api/v1/provider/serviceman?offset=1\",\n    \"links\": [\n      {\n        \"url\": null,\n        \"label\": \"&laquo; Previous\",\n        \"active\": false\n      },\n      {\n        \"url\": \"/api/v1/provider/serviceman?offset=1\",\n        \"label\": \"1\",\n        \"active\": true\n      },\n      {\n        \"url\": null,\n        \"label\": \"Next &raquo;\",\n        \"active\": false\n      }\n    ],\n    \"next_page_url\": null,\n    \"path\": \"/api/v1/provider/serviceman\",\n    \"per_page\": 10,\n    \"prev_page_url\": null,\n    \"to\": 1,\n    \"total\": 1\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Serviceman",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/serviceman/{{serviceman_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "serviceman",
+                "{{serviceman_id}}"
+              ]
+            },
+            "description": "Member profile."
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/serviceman/{id}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "serviceman",
+                    "{id}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"id\": \"d4e5f6a7-b8c9-0123-def0-234567890123\",\n    \"first_name\": \"Ahmed\",\n    \"last_name\": \"Hassan\",\n    \"full_name\": \"Ahmed Hassan\",\n    \"email\": \"ahmed.hassan@clean365.tech\",\n    \"phone\": \"+201000000001\",\n    \"profile_image_full_path\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n    \"is_active\": 1,\n    \"serviceman_id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n    \"user_id\": \"d4e5f6a7-b8c9-0123-def0-234567890123\",\n    \"provider_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n    \"user_type\": \"provider-serviceman\",\n    \"bookings_count\": {\n      \"ongoing\": 2,\n      \"completed\": 15,\n      \"canceled\": 1\n    }\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 — Bookings",
+      "description": "Assigned jobs tab + job details.\n\nUse **Ops jobs** for the Flutter screens (filters by `field_status`).\nLocation: `location.text`, `location.lat`, `location.lng` and `coordinates.{lat,lng}`.",
+      "item": [
+        {
+          "name": "Assigned Jobs List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/jobs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "jobs"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Required"
+                },
+                {
+                  "key": "offset",
+                  "value": "1",
+                  "description": "Required"
+                },
+                {
+                  "key": "field_status",
+                  "value": "all",
+                  "description": "all|assigned|on_the_way|arrived|in_progress|completed"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Order / customer / team"
+                },
+                {
+                  "key": "date",
+                  "value": "",
+                  "description": "YYYY-MM-DD"
+                }
+              ]
+            },
+            "description": "المهام المسندة. Requires `team_id` on the booking.\nQuery: `field_status`, `search`, `date`, `limit`, `offset`."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j=pm.response.json();",
+                  "const d=j.content?.jobs?.data;",
+                  "if(d?.[0]?.id) pm.collectionVariables.set('booking_id', d[0].id);"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/jobs",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "jobs"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"summary\": {\n      \"total\": 16,\n      \"progress_percent\": 36,\n      \"assigned\": 3,\n      \"on_the_way\": 2,\n      \"arrived\": 1,\n      \"in_progress\": 4,\n      \"completed\": 6\n    },\n    \"jobs\": {\n      \"current_page\": 1,\n      \"data\": [\n        {\n          \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n          \"readable_id\": \"CLN-2458\",\n          \"title\": \"Deep Cleaning\",\n          \"field_status\": \"in_progress\",\n          \"booking_status\": \"ongoing\",\n          \"package_label\": \"Monthly package\",\n          \"progress_percent\": 65,\n          \"tasks_summary\": {\n            \"completed\": 2,\n            \"total\": 3\n          },\n          \"attendance\": {\n            \"attended\": 3,\n            \"total\": 3\n          },\n          \"schedule_at\": \"2026-06-27 16:00:00\",\n          \"customer\": {\n            \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n            \"name\": \"Abdulrahman Jamil\",\n            \"phone\": \"+966551234567\"\n          },\n          \"property_type\": \"Apartment\",\n          \"location_text\": \"An Narjis District, Riyadh\",\n          \"location\": {\n            \"text\": \"An Narjis District, Riyadh\",\n            \"lat\": 24.8301,\n            \"lng\": 46.7056\n          },\n          \"coordinates\": {\n            \"lat\": 24.8301,\n            \"lng\": 46.7056\n          },\n          \"team\": {\n            \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n            \"name\": \"Team 2\",\n            \"members_count\": 3,\n            \"members\": [\n              {\n                \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n                \"name\": \"Sami Ali\",\n                \"phone\": \"+966500000001\",\n                \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n              },\n              {\n                \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n                \"name\": \"Khaled Ahmed\",\n                \"phone\": \"+966500000002\",\n                \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n              },\n              {\n                \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n                \"name\": \"Ahmed Hassan\",\n                \"phone\": \"+966500000003\",\n                \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n              }\n            ]\n          }\n        }\n      ],\n      \"first_page_url\": \"/api/v1/provider/ops/jobs?offset=1\",\n      \"from\": 1,\n      \"last_page\": 1,\n      \"last_page_url\": \"/api/v1/provider/ops/jobs?offset=1\",\n      \"links\": [\n        {\n          \"url\": null,\n          \"label\": \"&laquo; Previous\",\n          \"active\": false\n        },\n        {\n          \"url\": \"/api/v1/provider/ops/jobs?offset=1\",\n          \"label\": \"1\",\n          \"active\": true\n        },\n        {\n          \"url\": null,\n          \"label\": \"Next &raquo;\",\n          \"active\": false\n        }\n      ],\n      \"next_page_url\": null,\n      \"path\": \"/api/v1/provider/ops/jobs\",\n      \"per_page\": 10,\n      \"prev_page_url\": null,\n      \"to\": 1,\n      \"total\": 1\n    }\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Job Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/jobs/{{booking_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "jobs",
+                "{{booking_id}}"
+              ]
+            },
+            "description": "Stepper, team, attendance, customer, location lat/lng, photos, notes, tasks."
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/jobs/{id}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "jobs",
+                    "{id}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n    \"readable_id\": \"CLN-2458\",\n    \"title\": \"Deep Cleaning\",\n    \"field_status\": \"in_progress\",\n    \"booking_status\": \"ongoing\",\n    \"package_label\": \"Monthly package\",\n    \"progress_percent\": 65,\n    \"tasks_summary\": {\n      \"completed\": 2,\n      \"total\": 3\n    },\n    \"attendance\": {\n      \"attended\": 3,\n      \"total\": 3\n    },\n    \"schedule_at\": \"2026-06-27 16:00:00\",\n    \"customer\": {\n      \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n      \"name\": \"Abdulrahman Jamil\",\n      \"phone\": \"+966551234567\"\n    },\n    \"property_type\": \"Apartment\",\n    \"location_text\": \"An Narjis District, Riyadh\",\n    \"location\": {\n      \"text\": \"An Narjis District, Riyadh\",\n      \"lat\": 24.8301,\n      \"lng\": 46.7056\n    },\n    \"coordinates\": {\n      \"lat\": 24.8301,\n      \"lng\": 46.7056\n    },\n    \"team\": {\n      \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n      \"name\": \"Team 2\",\n      \"members_count\": 3,\n      \"members\": [\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n          \"name\": \"Sami Ali\",\n          \"phone\": \"+966500000001\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        },\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n          \"name\": \"Khaled Ahmed\",\n          \"phone\": \"+966500000002\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        },\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n          \"name\": \"Ahmed Hassan\",\n          \"phone\": \"+966500000003\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        }\n      ],\n      \"attendance\": {\n        \"attended\": 3,\n        \"total\": 3\n      }\n    },\n    \"customer_note\": \"Please focus on cleaning the kitchen and bathrooms, and ensure surfaces are sanitized.\",\n    \"field_status_timeline\": [\n      \"assigned\",\n      \"on_the_way\",\n      \"arrived\",\n      \"in_progress\",\n      \"completed\"\n    ],\n    \"photos\": {\n      \"before\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"during\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"after\": [],\n      \"counts\": {\n        \"before\": 3,\n        \"during\": 2,\n        \"after\": 0\n      }\n    },\n    \"execution_notes\": [\n      {\n        \"id\": \"note-001\",\n        \"note\": \"Started kitchen and bathroom cleaning; work is on plan.\",\n        \"user_id\": \"b2c3d4e5-f6a7-8901-bcde-f12345678901\",\n        \"user_name\": \"Mohamed Ali\",\n        \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n      }\n    ],\n    \"tasks\": [\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123456\",\n        \"title\": \"Kitchen deep clean\",\n        \"status\": \"completed\",\n        \"attendees_count\": 2\n      },\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123457\",\n        \"title\": \"Bathrooms sanitize\",\n        \"status\": \"in_progress\",\n        \"attendees_count\": 2\n      },\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123458\",\n        \"title\": \"Living room wipe\",\n        \"status\": \"pending\",\n        \"attendees_count\": 1\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Field Status → on_the_way",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/jobs/{{booking_id}}/field-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "jobs",
+                "{{booking_id}}",
+                "field-status"
+              ]
+            },
+            "description": "Body: `{ \"field_status\": \"on_the_way\" }`",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"field_status\": \"on_the_way\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/jobs/{id}/field-status",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "jobs",
+                    "{id}",
+                    "field-status"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_update_200\",\n  \"message\": \"successfully updated\",\n  \"content\": {\n    \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n    \"readable_id\": \"CLN-2458\",\n    \"title\": \"Deep Cleaning\",\n    \"field_status\": \"in_progress\",\n    \"booking_status\": \"ongoing\",\n    \"package_label\": \"Monthly package\",\n    \"progress_percent\": 65,\n    \"tasks_summary\": {\n      \"completed\": 2,\n      \"total\": 3\n    },\n    \"attendance\": {\n      \"attended\": 3,\n      \"total\": 3\n    },\n    \"schedule_at\": \"2026-06-27 16:00:00\",\n    \"customer\": {\n      \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n      \"name\": \"Abdulrahman Jamil\",\n      \"phone\": \"+966551234567\"\n    },\n    \"property_type\": \"Apartment\",\n    \"location_text\": \"An Narjis District, Riyadh\",\n    \"location\": {\n      \"text\": \"An Narjis District, Riyadh\",\n      \"lat\": 24.8301,\n      \"lng\": 46.7056\n    },\n    \"coordinates\": {\n      \"lat\": 24.8301,\n      \"lng\": 46.7056\n    },\n    \"team\": {\n      \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n      \"name\": \"Team 2\",\n      \"members_count\": 3,\n      \"members\": [\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n          \"name\": \"Sami Ali\",\n          \"phone\": \"+966500000001\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        },\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n          \"name\": \"Khaled Ahmed\",\n          \"phone\": \"+966500000002\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        },\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n          \"name\": \"Ahmed Hassan\",\n          \"phone\": \"+966500000003\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        }\n      ],\n      \"attendance\": {\n        \"attended\": 3,\n        \"total\": 3\n      }\n    },\n    \"customer_note\": \"Please focus on cleaning the kitchen and bathrooms, and ensure surfaces are sanitized.\",\n    \"field_status_timeline\": [\n      \"assigned\",\n      \"on_the_way\",\n      \"arrived\",\n      \"in_progress\",\n      \"completed\"\n    ],\n    \"photos\": {\n      \"before\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"during\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"after\": [],\n      \"counts\": {\n        \"before\": 3,\n        \"during\": 2,\n        \"after\": 0\n      }\n    },\n    \"execution_notes\": [\n      {\n        \"id\": \"note-001\",\n        \"note\": \"Started kitchen and bathroom cleaning; work is on plan.\",\n        \"user_id\": \"b2c3d4e5-f6a7-8901-bcde-f12345678901\",\n        \"user_name\": \"Mohamed Ali\",\n        \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n      }\n    ],\n    \"tasks\": [\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123456\",\n        \"title\": \"Kitchen deep clean\",\n        \"status\": \"completed\",\n        \"attendees_count\": 2\n      },\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123457\",\n        \"title\": \"Bathrooms sanitize\",\n        \"status\": \"in_progress\",\n        \"attendees_count\": 2\n      },\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123458\",\n        \"title\": \"Living room wipe\",\n        \"status\": \"pending\",\n        \"attendees_count\": 1\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Field Status → arrived",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/jobs/{{booking_id}}/field-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "jobs",
+                "{{booking_id}}",
+                "field-status"
+              ]
+            },
+            "description": "Body: `{ \"field_status\": \"arrived\" }`",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"field_status\": \"arrived\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/jobs/{id}/field-status",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "jobs",
+                    "{id}",
+                    "field-status"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_update_200\",\n  \"message\": \"successfully updated\",\n  \"content\": {\n    \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n    \"readable_id\": \"CLN-2458\",\n    \"title\": \"Deep Cleaning\",\n    \"field_status\": \"in_progress\",\n    \"booking_status\": \"ongoing\",\n    \"package_label\": \"Monthly package\",\n    \"progress_percent\": 65,\n    \"tasks_summary\": {\n      \"completed\": 2,\n      \"total\": 3\n    },\n    \"attendance\": {\n      \"attended\": 3,\n      \"total\": 3\n    },\n    \"schedule_at\": \"2026-06-27 16:00:00\",\n    \"customer\": {\n      \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n      \"name\": \"Abdulrahman Jamil\",\n      \"phone\": \"+966551234567\"\n    },\n    \"property_type\": \"Apartment\",\n    \"location_text\": \"An Narjis District, Riyadh\",\n    \"location\": {\n      \"text\": \"An Narjis District, Riyadh\",\n      \"lat\": 24.8301,\n      \"lng\": 46.7056\n    },\n    \"coordinates\": {\n      \"lat\": 24.8301,\n      \"lng\": 46.7056\n    },\n    \"team\": {\n      \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n      \"name\": \"Team 2\",\n      \"members_count\": 3,\n      \"members\": [\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n          \"name\": \"Sami Ali\",\n          \"phone\": \"+966500000001\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        },\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n          \"name\": \"Khaled Ahmed\",\n          \"phone\": \"+966500000002\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        },\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n          \"name\": \"Ahmed Hassan\",\n          \"phone\": \"+966500000003\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        }\n      ],\n      \"attendance\": {\n        \"attended\": 3,\n        \"total\": 3\n      }\n    },\n    \"customer_note\": \"Please focus on cleaning the kitchen and bathrooms, and ensure surfaces are sanitized.\",\n    \"field_status_timeline\": [\n      \"assigned\",\n      \"on_the_way\",\n      \"arrived\",\n      \"in_progress\",\n      \"completed\"\n    ],\n    \"photos\": {\n      \"before\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"during\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"after\": [],\n      \"counts\": {\n        \"before\": 3,\n        \"during\": 2,\n        \"after\": 0\n      }\n    },\n    \"execution_notes\": [\n      {\n        \"id\": \"note-001\",\n        \"note\": \"Started kitchen and bathroom cleaning; work is on plan.\",\n        \"user_id\": \"b2c3d4e5-f6a7-8901-bcde-f12345678901\",\n        \"user_name\": \"Mohamed Ali\",\n        \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n      }\n    ],\n    \"tasks\": [\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123456\",\n        \"title\": \"Kitchen deep clean\",\n        \"status\": \"completed\",\n        \"attendees_count\": 2\n      },\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123457\",\n        \"title\": \"Bathrooms sanitize\",\n        \"status\": \"in_progress\",\n        \"attendees_count\": 2\n      },\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123458\",\n        \"title\": \"Living room wipe\",\n        \"status\": \"pending\",\n        \"attendees_count\": 1\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Field Status → in_progress",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/jobs/{{booking_id}}/field-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "jobs",
+                "{{booking_id}}",
+                "field-status"
+              ]
+            },
+            "description": "Also sets booking_status=ongoing.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"field_status\": \"in_progress\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/jobs/{id}/field-status",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "jobs",
+                    "{id}",
+                    "field-status"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_update_200\",\n  \"message\": \"successfully updated\",\n  \"content\": {\n    \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n    \"readable_id\": \"CLN-2458\",\n    \"title\": \"Deep Cleaning\",\n    \"field_status\": \"in_progress\",\n    \"booking_status\": \"ongoing\",\n    \"package_label\": \"Monthly package\",\n    \"progress_percent\": 65,\n    \"tasks_summary\": {\n      \"completed\": 2,\n      \"total\": 3\n    },\n    \"attendance\": {\n      \"attended\": 3,\n      \"total\": 3\n    },\n    \"schedule_at\": \"2026-06-27 16:00:00\",\n    \"customer\": {\n      \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n      \"name\": \"Abdulrahman Jamil\",\n      \"phone\": \"+966551234567\"\n    },\n    \"property_type\": \"Apartment\",\n    \"location_text\": \"An Narjis District, Riyadh\",\n    \"location\": {\n      \"text\": \"An Narjis District, Riyadh\",\n      \"lat\": 24.8301,\n      \"lng\": 46.7056\n    },\n    \"coordinates\": {\n      \"lat\": 24.8301,\n      \"lng\": 46.7056\n    },\n    \"team\": {\n      \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n      \"name\": \"Team 2\",\n      \"members_count\": 3,\n      \"members\": [\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n          \"name\": \"Sami Ali\",\n          \"phone\": \"+966500000001\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        },\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n          \"name\": \"Khaled Ahmed\",\n          \"phone\": \"+966500000002\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        },\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n          \"name\": \"Ahmed Hassan\",\n          \"phone\": \"+966500000003\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        }\n      ],\n      \"attendance\": {\n        \"attended\": 3,\n        \"total\": 3\n      }\n    },\n    \"customer_note\": \"Please focus on cleaning the kitchen and bathrooms, and ensure surfaces are sanitized.\",\n    \"field_status_timeline\": [\n      \"assigned\",\n      \"on_the_way\",\n      \"arrived\",\n      \"in_progress\",\n      \"completed\"\n    ],\n    \"photos\": {\n      \"before\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"during\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"after\": [],\n      \"counts\": {\n        \"before\": 3,\n        \"during\": 2,\n        \"after\": 0\n      }\n    },\n    \"execution_notes\": [\n      {\n        \"id\": \"note-001\",\n        \"note\": \"Started kitchen and bathroom cleaning; work is on plan.\",\n        \"user_id\": \"b2c3d4e5-f6a7-8901-bcde-f12345678901\",\n        \"user_name\": \"Mohamed Ali\",\n        \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n      }\n    ],\n    \"tasks\": [\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123456\",\n        \"title\": \"Kitchen deep clean\",\n        \"status\": \"completed\",\n        \"attendees_count\": 2\n      },\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123457\",\n        \"title\": \"Bathrooms sanitize\",\n        \"status\": \"in_progress\",\n        \"attendees_count\": 2\n      },\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123458\",\n        \"title\": \"Living room wipe\",\n        \"status\": \"pending\",\n        \"attendees_count\": 1\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Field Status → completed",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/jobs/{{booking_id}}/field-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "jobs",
+                "{{booking_id}}",
+                "field-status"
+              ]
+            },
+            "description": "Also sets booking_status=completed.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"field_status\": \"completed\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/jobs/{id}/field-status",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "jobs",
+                    "{id}",
+                    "field-status"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_update_200\",\n  \"message\": \"successfully updated\",\n  \"content\": {\n    \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n    \"readable_id\": \"CLN-2458\",\n    \"title\": \"Deep Cleaning\",\n    \"field_status\": \"in_progress\",\n    \"booking_status\": \"ongoing\",\n    \"package_label\": \"Monthly package\",\n    \"progress_percent\": 65,\n    \"tasks_summary\": {\n      \"completed\": 2,\n      \"total\": 3\n    },\n    \"attendance\": {\n      \"attended\": 3,\n      \"total\": 3\n    },\n    \"schedule_at\": \"2026-06-27 16:00:00\",\n    \"customer\": {\n      \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n      \"name\": \"Abdulrahman Jamil\",\n      \"phone\": \"+966551234567\"\n    },\n    \"property_type\": \"Apartment\",\n    \"location_text\": \"An Narjis District, Riyadh\",\n    \"location\": {\n      \"text\": \"An Narjis District, Riyadh\",\n      \"lat\": 24.8301,\n      \"lng\": 46.7056\n    },\n    \"coordinates\": {\n      \"lat\": 24.8301,\n      \"lng\": 46.7056\n    },\n    \"team\": {\n      \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n      \"name\": \"Team 2\",\n      \"members_count\": 3,\n      \"members\": [\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n          \"name\": \"Sami Ali\",\n          \"phone\": \"+966500000001\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        },\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n          \"name\": \"Khaled Ahmed\",\n          \"phone\": \"+966500000002\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        },\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n          \"name\": \"Ahmed Hassan\",\n          \"phone\": \"+966500000003\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        }\n      ],\n      \"attendance\": {\n        \"attended\": 3,\n        \"total\": 3\n      }\n    },\n    \"customer_note\": \"Please focus on cleaning the kitchen and bathrooms, and ensure surfaces are sanitized.\",\n    \"field_status_timeline\": [\n      \"assigned\",\n      \"on_the_way\",\n      \"arrived\",\n      \"in_progress\",\n      \"completed\"\n    ],\n    \"photos\": {\n      \"before\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"during\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"after\": [],\n      \"counts\": {\n        \"before\": 3,\n        \"during\": 2,\n        \"after\": 0\n      }\n    },\n    \"execution_notes\": [\n      {\n        \"id\": \"note-001\",\n        \"note\": \"Started kitchen and bathroom cleaning; work is on plan.\",\n        \"user_id\": \"b2c3d4e5-f6a7-8901-bcde-f12345678901\",\n        \"user_name\": \"Mohamed Ali\",\n        \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n      }\n    ],\n    \"tasks\": [\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123456\",\n        \"title\": \"Kitchen deep clean\",\n        \"status\": \"completed\",\n        \"attendees_count\": 2\n      },\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123457\",\n        \"title\": \"Bathrooms sanitize\",\n        \"status\": \"in_progress\",\n        \"attendees_count\": 2\n      },\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123458\",\n        \"title\": \"Living room wipe\",\n        \"status\": \"pending\",\n        \"attendees_count\": 1\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add Execution Note",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/jobs/{{booking_id}}/notes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "jobs",
+                "{{booking_id}}",
+                "notes"
+              ]
+            },
+            "description": "Operational notes log.\nBody: `{ \"note\": \"...\" }`",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Kitchen and bathrooms started; work is on plan.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/jobs/{id}/notes",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "jobs",
+                    "{id}",
+                    "notes"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_store_200\",\n  \"message\": \"successfully added\",\n  \"content\": {\n    \"id\": \"note-002\",\n    \"note\": \"Kitchen area completed.\",\n    \"user_id\": \"b2c3d4e5-f6a7-8901-bcde-f12345678901\",\n    \"user_name\": \"Mohamed Ali\",\n    \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Attendance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/jobs/{{booking_id}}/attendance",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "jobs",
+                "{{booking_id}}",
+                "attendance"
+              ]
+            },
+            "description": "حضور X من Y."
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/jobs/{id}/attendance",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "jobs",
+                    "{id}",
+                    "attendance"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"summary\": {\n      \"attended\": 3,\n      \"total\": 3\n    },\n    \"members\": [\n      {\n        \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n        \"name\": \"Sami Ali\",\n        \"is_attended\": true,\n        \"checked_in_at\": \"2026-07-11T14:30:00.000000Z\"\n      },\n      {\n        \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n        \"name\": \"Khaled Ahmed\",\n        \"is_attended\": true,\n        \"checked_in_at\": \"2026-07-11T14:30:00.000000Z\"\n      },\n      {\n        \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n        \"name\": \"Ahmed Hassan\",\n        \"is_attended\": true,\n        \"checked_in_at\": \"2026-07-11T14:30:00.000000Z\"\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register Member Attendance",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/jobs/{{booking_id}}/attendance",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "jobs",
+                "{{booking_id}}",
+                "attendance"
+              ]
+            },
+            "description": "Supervisor marks a team member present/absent.\n\n**Body:** `{ \"serviceman_id\": \"...\", \"is_attended\": true, \"latitude\": 24.83, \"longitude\": 46.70 }`",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"serviceman_id\": \"{{serviceman_id}}\",\n  \"is_attended\": true,\n  \"latitude\": \"{{check_in_latitude}}\",\n  \"longitude\": \"{{check_in_longitude}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/jobs/{id}/attendance",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "jobs",
+                    "{id}",
+                    "attendance"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"summary\": {\n      \"attended\": 3,\n      \"total\": 3\n    },\n    \"members\": [\n      {\n        \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n        \"name\": \"Sami Ali\",\n        \"is_attended\": true,\n        \"checked_in_at\": \"2026-07-11T14:30:00.000000Z\"\n      },\n      {\n        \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n        \"name\": \"Khaled Ahmed\",\n        \"is_attended\": true,\n        \"checked_in_at\": \"2026-07-11T14:30:00.000000Z\"\n      },\n      {\n        \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n        \"name\": \"Ahmed Hassan\",\n        \"is_attended\": true,\n        \"checked_in_at\": \"2026-07-11T14:30:00.000000Z\"\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Upload Before Photos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/jobs/{{booking_id}}/images/before",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "jobs",
+                "{{booking_id}}",
+                "images",
+                "before"
+              ]
+            },
+            "description": "multipart `images[]`",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "images",
+                  "value": "",
+                  "type": "file",
+                  "description": "One or more"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/jobs/{id}/images/before",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "jobs",
+                    "{id}",
+                    "images",
+                    "before"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_store_200\",\n  \"message\": \"successfully added\",\n  \"content\": {\n    \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n    \"readable_id\": \"CLN-2458\",\n    \"title\": \"Deep Cleaning\",\n    \"field_status\": \"in_progress\",\n    \"booking_status\": \"ongoing\",\n    \"package_label\": \"Monthly package\",\n    \"progress_percent\": 65,\n    \"tasks_summary\": {\n      \"completed\": 2,\n      \"total\": 3\n    },\n    \"attendance\": {\n      \"attended\": 3,\n      \"total\": 3\n    },\n    \"schedule_at\": \"2026-06-27 16:00:00\",\n    \"customer\": {\n      \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n      \"name\": \"Abdulrahman Jamil\",\n      \"phone\": \"+966551234567\"\n    },\n    \"property_type\": \"Apartment\",\n    \"location_text\": \"An Narjis District, Riyadh\",\n    \"location\": {\n      \"text\": \"An Narjis District, Riyadh\",\n      \"lat\": 24.8301,\n      \"lng\": 46.7056\n    },\n    \"coordinates\": {\n      \"lat\": 24.8301,\n      \"lng\": 46.7056\n    },\n    \"team\": {\n      \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n      \"name\": \"Team 2\",\n      \"members_count\": 3,\n      \"members\": [\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n          \"name\": \"Sami Ali\",\n          \"phone\": \"+966500000001\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        },\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n          \"name\": \"Khaled Ahmed\",\n          \"phone\": \"+966500000002\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        },\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n          \"name\": \"Ahmed Hassan\",\n          \"phone\": \"+966500000003\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        }\n      ],\n      \"attendance\": {\n        \"attended\": 3,\n        \"total\": 3\n      }\n    },\n    \"customer_note\": \"Please focus on cleaning the kitchen and bathrooms, and ensure surfaces are sanitized.\",\n    \"field_status_timeline\": [\n      \"assigned\",\n      \"on_the_way\",\n      \"arrived\",\n      \"in_progress\",\n      \"completed\"\n    ],\n    \"photos\": {\n      \"before\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"during\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"after\": [],\n      \"counts\": {\n        \"before\": 3,\n        \"during\": 2,\n        \"after\": 0\n      }\n    },\n    \"execution_notes\": [\n      {\n        \"id\": \"note-001\",\n        \"note\": \"Started kitchen and bathroom cleaning; work is on plan.\",\n        \"user_id\": \"b2c3d4e5-f6a7-8901-bcde-f12345678901\",\n        \"user_name\": \"Mohamed Ali\",\n        \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n      }\n    ],\n    \"tasks\": [\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123456\",\n        \"title\": \"Kitchen deep clean\",\n        \"status\": \"completed\",\n        \"attendees_count\": 2\n      },\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123457\",\n        \"title\": \"Bathrooms sanitize\",\n        \"status\": \"in_progress\",\n        \"attendees_count\": 2\n      },\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123458\",\n        \"title\": \"Living room wipe\",\n        \"status\": \"pending\",\n        \"attendees_count\": 1\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Upload During Photos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/jobs/{{booking_id}}/images/during",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "jobs",
+                "{{booking_id}}",
+                "images",
+                "during"
+              ]
+            },
+            "description": "multipart `images[]`",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "images",
+                  "value": "",
+                  "type": "file",
+                  "description": "One or more"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/jobs/{id}/images/during",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "jobs",
+                    "{id}",
+                    "images",
+                    "during"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_store_200\",\n  \"message\": \"successfully added\",\n  \"content\": {\n    \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n    \"readable_id\": \"CLN-2458\",\n    \"title\": \"Deep Cleaning\",\n    \"field_status\": \"in_progress\",\n    \"booking_status\": \"ongoing\",\n    \"package_label\": \"Monthly package\",\n    \"progress_percent\": 65,\n    \"tasks_summary\": {\n      \"completed\": 2,\n      \"total\": 3\n    },\n    \"attendance\": {\n      \"attended\": 3,\n      \"total\": 3\n    },\n    \"schedule_at\": \"2026-06-27 16:00:00\",\n    \"customer\": {\n      \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n      \"name\": \"Abdulrahman Jamil\",\n      \"phone\": \"+966551234567\"\n    },\n    \"property_type\": \"Apartment\",\n    \"location_text\": \"An Narjis District, Riyadh\",\n    \"location\": {\n      \"text\": \"An Narjis District, Riyadh\",\n      \"lat\": 24.8301,\n      \"lng\": 46.7056\n    },\n    \"coordinates\": {\n      \"lat\": 24.8301,\n      \"lng\": 46.7056\n    },\n    \"team\": {\n      \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n      \"name\": \"Team 2\",\n      \"members_count\": 3,\n      \"members\": [\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n          \"name\": \"Sami Ali\",\n          \"phone\": \"+966500000001\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        },\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n          \"name\": \"Khaled Ahmed\",\n          \"phone\": \"+966500000002\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        },\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n          \"name\": \"Ahmed Hassan\",\n          \"phone\": \"+966500000003\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        }\n      ],\n      \"attendance\": {\n        \"attended\": 3,\n        \"total\": 3\n      }\n    },\n    \"customer_note\": \"Please focus on cleaning the kitchen and bathrooms, and ensure surfaces are sanitized.\",\n    \"field_status_timeline\": [\n      \"assigned\",\n      \"on_the_way\",\n      \"arrived\",\n      \"in_progress\",\n      \"completed\"\n    ],\n    \"photos\": {\n      \"before\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"during\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"after\": [],\n      \"counts\": {\n        \"before\": 3,\n        \"during\": 2,\n        \"after\": 0\n      }\n    },\n    \"execution_notes\": [\n      {\n        \"id\": \"note-001\",\n        \"note\": \"Started kitchen and bathroom cleaning; work is on plan.\",\n        \"user_id\": \"b2c3d4e5-f6a7-8901-bcde-f12345678901\",\n        \"user_name\": \"Mohamed Ali\",\n        \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n      }\n    ],\n    \"tasks\": [\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123456\",\n        \"title\": \"Kitchen deep clean\",\n        \"status\": \"completed\",\n        \"attendees_count\": 2\n      },\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123457\",\n        \"title\": \"Bathrooms sanitize\",\n        \"status\": \"in_progress\",\n        \"attendees_count\": 2\n      },\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123458\",\n        \"title\": \"Living room wipe\",\n        \"status\": \"pending\",\n        \"attendees_count\": 1\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Upload After Photos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/jobs/{{booking_id}}/images/after",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "jobs",
+                "{{booking_id}}",
+                "images",
+                "after"
+              ]
+            },
+            "description": "multipart `images[]`",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "images",
+                  "value": "",
+                  "type": "file",
+                  "description": "One or more"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/jobs/{id}/images/after",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "jobs",
+                    "{id}",
+                    "images",
+                    "after"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_store_200\",\n  \"message\": \"successfully added\",\n  \"content\": {\n    \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n    \"readable_id\": \"CLN-2458\",\n    \"title\": \"Deep Cleaning\",\n    \"field_status\": \"in_progress\",\n    \"booking_status\": \"ongoing\",\n    \"package_label\": \"Monthly package\",\n    \"progress_percent\": 65,\n    \"tasks_summary\": {\n      \"completed\": 2,\n      \"total\": 3\n    },\n    \"attendance\": {\n      \"attended\": 3,\n      \"total\": 3\n    },\n    \"schedule_at\": \"2026-06-27 16:00:00\",\n    \"customer\": {\n      \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n      \"name\": \"Abdulrahman Jamil\",\n      \"phone\": \"+966551234567\"\n    },\n    \"property_type\": \"Apartment\",\n    \"location_text\": \"An Narjis District, Riyadh\",\n    \"location\": {\n      \"text\": \"An Narjis District, Riyadh\",\n      \"lat\": 24.8301,\n      \"lng\": 46.7056\n    },\n    \"coordinates\": {\n      \"lat\": 24.8301,\n      \"lng\": 46.7056\n    },\n    \"team\": {\n      \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n      \"name\": \"Team 2\",\n      \"members_count\": 3,\n      \"members\": [\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n          \"name\": \"Sami Ali\",\n          \"phone\": \"+966500000001\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        },\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789099\",\n          \"name\": \"Khaled Ahmed\",\n          \"phone\": \"+966500000002\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        },\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789088\",\n          \"name\": \"Ahmed Hassan\",\n          \"phone\": \"+966500000003\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\"\n        }\n      ],\n      \"attendance\": {\n        \"attended\": 3,\n        \"total\": 3\n      }\n    },\n    \"customer_note\": \"Please focus on cleaning the kitchen and bathrooms, and ensure surfaces are sanitized.\",\n    \"field_status_timeline\": [\n      \"assigned\",\n      \"on_the_way\",\n      \"arrived\",\n      \"in_progress\",\n      \"completed\"\n    ],\n    \"photos\": {\n      \"before\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"during\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\",\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"after\": [],\n      \"counts\": {\n        \"before\": 3,\n        \"during\": 2,\n        \"after\": 0\n      }\n    },\n    \"execution_notes\": [\n      {\n        \"id\": \"note-001\",\n        \"note\": \"Started kitchen and bathroom cleaning; work is on plan.\",\n        \"user_id\": \"b2c3d4e5-f6a7-8901-bcde-f12345678901\",\n        \"user_name\": \"Mohamed Ali\",\n        \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n      }\n    ],\n    \"tasks\": [\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123456\",\n        \"title\": \"Kitchen deep clean\",\n        \"status\": \"completed\",\n        \"attendees_count\": 2\n      },\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123457\",\n        \"title\": \"Bathrooms sanitize\",\n        \"status\": \"in_progress\",\n        \"attendees_count\": 2\n      },\n      {\n        \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123458\",\n        \"title\": \"Living room wipe\",\n        \"status\": \"pending\",\n        \"attendees_count\": 1\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Report Operational Issue",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/jobs/{{booking_id}}/support",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "jobs",
+                "{{booking_id}}",
+                "support"
+              ]
+            },
+            "description": "type=`operational_issue` | `support` | `attachment`",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "type",
+                  "value": "operational_issue",
+                  "type": "text",
+                  "description": ""
+                },
+                {
+                  "key": "message",
+                  "value": "Team needs extra sanitizing tools",
+                  "type": "text",
+                  "description": ""
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/jobs/{id}/support",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "jobs",
+                    "{id}",
+                    "support"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_store_200\",\n  \"message\": \"successfully added\",\n  \"content\": {\n    \"id\": \"support-001\",\n    \"type\": \"support\",\n    \"message\": \"Need extra mop kits for Team 2\",\n    \"status\": \"open\",\n    \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Bookings (pipeline)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/booking/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "booking"
+              ]
+            },
+            "description": "Use `accepted` / `ongoing` / `completed` / `all`. Pending is admin-only.\nEach item has `location.lat` / `location.lng`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"limit\": 10,\n  \"offset\": 1,\n  \"booking_status\": \"accepted\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j=pm.response.json();",
+                  "const d=j.content?.bookings?.data||j.content?.data;",
+                  "if(d?.[0]?.id) pm.collectionVariables.set('booking_id', d[0].id);"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/booking/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "booking"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"bookings_count\": {\n      \"pending\": 3,\n      \"accepted\": 5,\n      \"ongoing\": 2,\n      \"completed\": 140,\n      \"canceled\": 6\n    },\n    \"bookings\": {\n      \"current_page\": 1,\n      \"data\": [\n        {\n          \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n          \"readable_id\": 100042,\n          \"booking_status\": \"accepted\",\n          \"field_status\": \"assigned\",\n          \"progress_percent\": 0,\n          \"service_schedule\": \"2026-07-12 09:00:00\",\n          \"title\": \"Deep Cleaning\",\n          \"customer\": {\n            \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n            \"name\": \"Fatma Ibrahim\",\n            \"phone\": \"+201012345678\"\n          },\n          \"property_type\": \"Apartment\",\n          \"location_text\": \"15 Nile Corniche, Zamalek, Cairo\",\n          \"team\": {\n            \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n            \"name\": \"Morning Cleaning Crew\",\n            \"is_active\": true,\n            \"members_count\": 2,\n            \"members\": [\n              {\n                \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n                \"name\": \"Ahmed Hassan\",\n                \"phone\": \"+201000000001\",\n                \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n                \"is_active\": 1\n              },\n              {\n                \"id\": \"d5e6f7a8-b9c0-1234-def0-345678901234\",\n                \"name\": \"Sara Mahmoud\",\n                \"phone\": \"+201000000002\",\n                \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n                \"is_active\": 1\n              }\n            ]\n          },\n          \"is_paid\": 1,\n          \"total_booking_amount\": 450.0,\n          \"customer_note\": \"Please focus on kitchen and bathrooms.\",\n          \"coordinates\": {\n            \"lat\": 30.04442,\n            \"lng\": 31.235712\n          },\n          \"payment_method\": \"cash_after_service\",\n          \"services\": [\n            {\n              \"id\": \"svc-detail-001\",\n              \"service_id\": \"f2a3b4c5-d6e7-8901-5678-012345678901\",\n              \"service_name\": \"Deep Cleaning\",\n              \"quantity\": 1,\n              \"total_cost\": 450.0\n            }\n          ],\n          \"status_histories\": [\n            {\n              \"booking_status\": \"accepted\",\n              \"changed_by\": \"b2c3d4e5-f6a7-8901-bcde-f12345678901\",\n              \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n            }\n          ]\n        }\n      ],\n      \"first_page_url\": \"/api/v1/provider/booking?offset=1\",\n      \"from\": 1,\n      \"last_page\": 1,\n      \"last_page_url\": \"/api/v1/provider/booking?offset=1\",\n      \"links\": [\n        {\n          \"url\": null,\n          \"label\": \"&laquo; Previous\",\n          \"active\": false\n        },\n        {\n          \"url\": \"/api/v1/provider/booking?offset=1\",\n          \"label\": \"1\",\n          \"active\": true\n        },\n        {\n          \"url\": null,\n          \"label\": \"Next &raquo;\",\n          \"active\": false\n        }\n      ],\n      \"next_page_url\": null,\n      \"path\": \"/api/v1/provider/booking\",\n      \"per_page\": 10,\n      \"prev_page_url\": null,\n      \"to\": 1,\n      \"total\": 1\n    }\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Booking Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/booking/{{booking_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "booking",
+                "{{booking_id}}"
+              ]
+            },
+            "description": "Lean booking. Team members only (no nested assigned_bookings). Location has lat/lng."
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/booking/{id}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "booking",
+                    "{id}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n    \"readable_id\": 100042,\n    \"booking_status\": \"accepted\",\n    \"field_status\": \"assigned\",\n    \"progress_percent\": 0,\n    \"service_schedule\": \"2026-07-12 09:00:00\",\n    \"title\": \"Deep Cleaning\",\n    \"customer\": {\n      \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n      \"name\": \"Fatma Ibrahim\",\n      \"phone\": \"+201012345678\"\n    },\n    \"property_type\": \"Apartment\",\n    \"location_text\": \"15 Nile Corniche, Zamalek, Cairo\",\n    \"team\": {\n      \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n      \"name\": \"Morning Cleaning Crew\",\n      \"is_active\": true,\n      \"members_count\": 2,\n      \"members\": [\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n          \"name\": \"Ahmed Hassan\",\n          \"phone\": \"+201000000001\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n          \"is_active\": 1\n        },\n        {\n          \"id\": \"d5e6f7a8-b9c0-1234-def0-345678901234\",\n          \"name\": \"Sara Mahmoud\",\n          \"phone\": \"+201000000002\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n          \"is_active\": 1\n        }\n      ]\n    },\n    \"is_paid\": 1,\n    \"total_booking_amount\": 450.0,\n    \"customer_note\": \"Please focus on kitchen and bathrooms.\",\n    \"coordinates\": {\n      \"lat\": 30.04442,\n      \"lng\": 31.235712\n    },\n    \"payment_method\": \"cash_after_service\",\n    \"services\": [\n      {\n        \"id\": \"svc-detail-001\",\n        \"service_id\": \"f2a3b4c5-d6e7-8901-5678-012345678901\",\n        \"service_name\": \"Deep Cleaning\",\n        \"quantity\": 1,\n        \"total_cost\": 450.0\n      }\n    ],\n    \"status_histories\": [\n      {\n        \"booking_status\": \"accepted\",\n        \"changed_by\": \"b2c3d4e5-f6a7-8901-bcde-f12345678901\",\n        \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Job Sub-tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/booking-task/booking/{{booking_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "booking-task",
+                "booking",
+                "{{booking_id}}"
+              ]
+            },
+            "description": "Checklist under the job."
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/booking-task/booking/{id}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "booking-task",
+                    "booking",
+                    "{id}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": [\n    {\n      \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123456\",\n      \"booking_id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n      \"team_id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n      \"title\": \"Deep clean kitchen\",\n      \"description\": \"Full kitchen sanitization including appliances and cabinets.\",\n      \"status\": \"pending\",\n      \"supervisor_notes\": \"Bring eco-friendly supplies. Customer allergic to strong chemicals.\",\n      \"before_images_full_path\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"after_images_full_path\": [],\n      \"team\": {\n        \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n        \"name\": \"Morning Cleaning Crew\"\n      },\n      \"created_at\": \"2026-07-11T14:30:00.000000Z\",\n      \"attendees\": [\n        {\n          \"id\": \"b8c9d0e1-f2a3-4567-1234-678901234567\",\n          \"serviceman_id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n          \"name\": \"Ahmed Hassan\",\n          \"phone\": \"+201000000001\",\n          \"is_attended\": false,\n          \"attended_at\": null,\n          \"notes\": null\n        }\n      ]\n    },\n    {\n      \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123456\",\n      \"booking_id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n      \"team_id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n      \"title\": \"Deep clean kitchen\",\n      \"description\": \"Full kitchen sanitization including appliances and cabinets.\",\n      \"status\": \"in_progress\",\n      \"supervisor_notes\": \"Bring eco-friendly supplies. Customer allergic to strong chemicals.\",\n      \"before_images_full_path\": [\n        \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n      ],\n      \"after_images_full_path\": [],\n      \"team\": {\n        \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n        \"name\": \"Morning Cleaning Crew\"\n      },\n      \"created_at\": \"2026-07-11T14:30:00.000000Z\",\n      \"attendees\": [\n        {\n          \"id\": \"b8c9d0e1-f2a3-4567-1234-678901234567\",\n          \"serviceman_id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n          \"name\": \"Ahmed Hassan\",\n          \"phone\": \"+201000000001\",\n          \"is_attended\": true,\n          \"attended_at\": \"2026-07-11T14:30:00.000000Z\",\n          \"notes\": \"Started kitchen area, grease buildup behind stove.\"\n        }\n      ]\n    }\n  ],\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Sub-task",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/booking-task/{{task_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "booking-task",
+                "{{task_id}}"
+              ]
+            },
+            "description": "Task + attendees."
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/booking-task/{id}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "booking-task",
+                    "{id}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123456\",\n    \"booking_id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n    \"team_id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n    \"title\": \"Deep clean kitchen\",\n    \"description\": \"Full kitchen sanitization including appliances and cabinets.\",\n    \"status\": \"in_progress\",\n    \"supervisor_notes\": \"Bring eco-friendly supplies. Customer allergic to strong chemicals.\",\n    \"before_images_full_path\": [\n      \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n    ],\n    \"after_images_full_path\": [],\n    \"team\": {\n      \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n      \"name\": \"Morning Cleaning Crew\"\n    },\n    \"created_at\": \"2026-07-11T14:30:00.000000Z\",\n    \"attendees\": [\n      {\n        \"id\": \"b8c9d0e1-f2a3-4567-1234-678901234567\",\n        \"serviceman_id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n        \"name\": \"Ahmed Hassan\",\n        \"phone\": \"+201000000001\",\n        \"is_attended\": true,\n        \"attended_at\": \"2026-07-11T14:30:00.000000Z\",\n        \"notes\": \"Started kitchen area, grease buildup behind stove.\"\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Sub-task Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/booking-task/{{task_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "booking-task",
+                "{{task_id}}",
+                "status"
+              ]
+            },
+            "description": "Body: `{ \"status\": \"in_progress\" }`",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in_progress\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/booking-task/{id}/status",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "booking-task",
+                    "{id}",
+                    "status"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"task_status_update_success_200\",\n  \"message\": \"Task status updated successfully\",\n  \"content\": {\n    \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123456\",\n    \"booking_id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n    \"team_id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n    \"title\": \"Deep clean kitchen\",\n    \"description\": \"Full kitchen sanitization including appliances and cabinets.\",\n    \"status\": \"in_progress\",\n    \"supervisor_notes\": \"Bring eco-friendly supplies. Customer allergic to strong chemicals.\",\n    \"before_images_full_path\": [\n      \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n    ],\n    \"after_images_full_path\": [],\n    \"team\": {\n      \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n      \"name\": \"Morning Cleaning Crew\"\n    },\n    \"created_at\": \"2026-07-11T14:30:00.000000Z\",\n    \"attendees\": [\n      {\n        \"id\": \"b8c9d0e1-f2a3-4567-1234-678901234567\",\n        \"serviceman_id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n        \"name\": \"Ahmed Hassan\",\n        \"phone\": \"+201000000001\",\n        \"is_attended\": true,\n        \"attended_at\": \"2026-07-11T14:30:00.000000Z\",\n        \"notes\": \"Started kitchen area, grease buildup behind stove.\"\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Sub-task Notes",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/booking-task/{{task_id}}/notes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "booking-task",
+                "{{task_id}}",
+                "notes"
+              ]
+            },
+            "description": "Body: `{ \"supervisor_notes\": \"...\" }`",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"supervisor_notes\": \"Kitchen done.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/booking-task/{id}/notes",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "booking-task",
+                    "{id}",
+                    "notes"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_update_200\",\n  \"message\": \"successfully updated\",\n  \"content\": {\n    \"id\": \"b8c9d0e1-f2a3-4567-1234-678901234567\",\n    \"serviceman_id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n    \"name\": \"Ahmed Hassan\",\n    \"phone\": \"+201000000001\",\n    \"is_attended\": true,\n    \"attended_at\": \"2026-07-11T14:30:00.000000Z\",\n    \"notes\": \"Started kitchen area, grease buildup behind stove.\"\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Upload Sub-task Before Images",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/booking-task/{{task_id}}/before-images",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "booking-task",
+                "{{task_id}}",
+                "before-images"
+              ]
+            },
+            "description": "multipart `before_images[]`",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "before_images",
+                  "value": "",
+                  "type": "file",
+                  "description": ""
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/booking-task/{id}/before-images",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "booking-task",
+                    "{id}",
+                    "before-images"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_update_200\",\n  \"message\": \"successfully updated\",\n  \"content\": {\n    \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123456\",\n    \"booking_id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n    \"team_id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n    \"title\": \"Deep clean kitchen\",\n    \"description\": \"Full kitchen sanitization including appliances and cabinets.\",\n    \"status\": \"in_progress\",\n    \"supervisor_notes\": \"Bring eco-friendly supplies. Customer allergic to strong chemicals.\",\n    \"before_images_full_path\": [\n      \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n    ],\n    \"after_images_full_path\": [],\n    \"team\": {\n      \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n      \"name\": \"Morning Cleaning Crew\"\n    },\n    \"created_at\": \"2026-07-11T14:30:00.000000Z\",\n    \"attendees\": [\n      {\n        \"id\": \"b8c9d0e1-f2a3-4567-1234-678901234567\",\n        \"serviceman_id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n        \"name\": \"Ahmed Hassan\",\n        \"phone\": \"+201000000001\",\n        \"is_attended\": true,\n        \"attended_at\": \"2026-07-11T14:30:00.000000Z\",\n        \"notes\": \"Started kitchen area, grease buildup behind stove.\"\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Upload Sub-task After Images",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/booking-task/{{task_id}}/after-images",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "booking-task",
+                "{{task_id}}",
+                "after-images"
+              ]
+            },
+            "description": "multipart `after_images[]`",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "after_images",
+                  "value": "",
+                  "type": "file",
+                  "description": ""
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/booking-task/{id}/after-images",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "booking-task",
+                    "{id}",
+                    "after-images"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_update_200\",\n  \"message\": \"successfully updated\",\n  \"content\": {\n    \"id\": \"a7b8c9d0-e1f2-3456-0123-567890123456\",\n    \"booking_id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n    \"team_id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n    \"title\": \"Deep clean kitchen\",\n    \"description\": \"Full kitchen sanitization including appliances and cabinets.\",\n    \"status\": \"in_progress\",\n    \"supervisor_notes\": \"Bring eco-friendly supplies. Customer allergic to strong chemicals.\",\n    \"before_images_full_path\": [\n      \"https://clean365.tech/storage/app/public/booking/task/2026-07-11-task001.png\"\n    ],\n    \"after_images_full_path\": [],\n    \"team\": {\n      \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n      \"name\": \"Morning Cleaning Crew\"\n    },\n    \"created_at\": \"2026-07-11T14:30:00.000000Z\",\n    \"attendees\": [\n      {\n        \"id\": \"b8c9d0e1-f2a3-4567-1234-678901234567\",\n        \"serviceman_id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n        \"name\": \"Ahmed Hassan\",\n        \"phone\": \"+201000000001\",\n        \"is_attended\": true,\n        \"attended_at\": \"2026-07-11T14:30:00.000000Z\",\n        \"notes\": \"Started kitchen area, grease buildup behind stove.\"\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 — Profile",
+      "description": "Profile tab: info, edit, password, FCM, app config.",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/info",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "info"
+              ]
+            },
+            "description": "Lean supervisor profile."
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/info",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "info"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n    \"role\": \"supervisor\",\n    \"first_name\": \"Mohamed\",\n    \"last_name\": \"Ali\",\n    \"full_name\": \"Mohamed Ali\",\n    \"email\": \"ops.test@clean365.sa\",\n    \"phone\": \"+966500000999\",\n    \"profile_image_full_path\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n    \"zone\": {\n      \"id\": \"c9d0e1f2-a3b4-5678-2345-789012345678\",\n      \"name\": \"Cairo Central\"\n    },\n    \"is_active\": 1,\n    \"is_approved\": 1\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/update/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "update",
+                "profile"
+              ]
+            },
+            "description": "multipart: first_name, last_name, phone, email, profile_image.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "first_name",
+                  "value": "Abdullah",
+                  "type": "text",
+                  "description": "Required"
+                },
+                {
+                  "key": "last_name",
+                  "value": "Khalaf",
+                  "type": "text",
+                  "description": ""
+                },
+                {
+                  "key": "phone",
+                  "value": "+966566347445",
+                  "type": "text",
+                  "description": "Required"
+                },
+                {
+                  "key": "email",
+                  "value": "v_j@hotmail.com",
+                  "type": "text",
+                  "description": ""
+                },
+                {
+                  "key": "profile_image",
+                  "value": "",
+                  "type": "file",
+                  "description": "Optional"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/update/profile",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "update",
+                    "profile"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_update_200\",\n  \"message\": \"successfully updated\",\n  \"content\": {\n    \"id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n    \"role\": \"supervisor\",\n    \"first_name\": \"Mohamed\",\n    \"last_name\": \"Ali\",\n    \"full_name\": \"Mohamed Ali\",\n    \"email\": \"ops.test@clean365.sa\",\n    \"phone\": \"+966500000999\",\n    \"profile_image_full_path\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n    \"zone\": {\n      \"id\": \"c9d0e1f2-a3b4-5678-2345-789012345678\",\n      \"name\": \"Cairo Central\"\n    },\n    \"is_active\": 1,\n    \"is_approved\": 1\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/update/password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "update",
+                "password"
+              ]
+            },
+            "description": "Body: current_password, password, confirm_password.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current_password\": \"{{supervisor_password}}\",\n  \"password\": \"password123\",\n  \"confirm_password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/update/password",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "update",
+                    "password"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_update_200\",\n  \"message\": \"successfully updated\",\n  \"content\": null,\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update FCM Token",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/update/fcm-token",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "update",
+                "fcm-token"
+              ]
+            },
+            "description": "Body: `{ \"fcm_token\": \"...\" }`",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fcm_token\": \"{{fcm_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/update/fcm-token",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "update",
+                    "fcm-token"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_update_200\",\n  \"message\": \"successfully updated\",\n  \"content\": null,\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "App Config",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/config",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "config"
+              ]
+            },
+            "description": "Public config / feature flags."
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/config",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "config"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"business_name\": \"Clean365\",\n    \"currency_symbol\": \"EGP\",\n    \"currency_code\": \"EGP\",\n    \"country_code\": \"EG\",\n    \"language_code\": \"en\",\n    \"time_zone\": \"Africa/Cairo\",\n    \"provider_app_version\": {\n      \"android\": \"3.8.0\",\n      \"ios\": \"3.8.0\"\n    },\n    \"serviceman_app_version\": {\n      \"android\": \"3.8.0\",\n      \"ios\": \"3.8.0\"\n    },\n    \"supervisor_mode\": true,\n    \"check_in_radius_km\": 1,\n    \"booking_statuses\": [\n      {\n        \"key\": \"pending\",\n        \"value\": \"Pending\"\n      },\n      {\n        \"key\": \"accepted\",\n        \"value\": \"Accepted\"\n      },\n      {\n        \"key\": \"ongoing\",\n        \"value\": \"Ongoing\"\n      },\n      {\n        \"key\": \"completed\",\n        \"value\": \"Completed\"\n      },\n      {\n        \"key\": \"canceled\",\n        \"value\": \"Canceled\"\n      }\n    ],\n    \"booking_task_statuses\": [\n      {\n        \"key\": \"pending\",\n        \"value\": \"Pending\"\n      },\n      {\n        \"key\": \"in_progress\",\n        \"value\": \"In Progress\"\n      },\n      {\n        \"key\": \"completed\",\n        \"value\": \"Completed\"\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06 — Errors",
+      "description": "Common failures for mobile handling. Admin-only 403s are omitted.",
+      "item": [
+        {
+          "name": "401 — Missing Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "dashboard"
+              ]
+            },
+            "description": "No Authorization."
+          },
+          "response": [
+            {
+              "name": "401 Unauthenticated",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/dashboard",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "dashboard"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Unauthenticated.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "400 — Teams Missing Params",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/teams",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "teams"
+              ]
+            },
+            "description": "Missing limit/offset."
+          },
+          "response": [
+            {
+              "name": "400",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/teams",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "teams"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_400\",\n  \"message\": \"invalid or missing information\",\n  \"content\": null,\n  \"errors\": [\n    {\n      \"error_code\": \"limit\",\n      \"message\": \"The limit field is required.\"\n    },\n    {\n      \"error_code\": \"offset\",\n      \"message\": \"The offset field is required.\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "204 — Job Not Found",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/jobs/00000000-0000-0000-0000-000000000000",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "jobs",
+                "00000000-0000-0000-0000-000000000000"
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "204",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/jobs/{id}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "jobs",
+                    "{id}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_204\",\n  \"message\": \"information not found\",\n  \"content\": null,\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "204 — Team Not Found",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supervisor_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/provider/ops/teams/00000000-0000-0000-0000-000000000000",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "provider",
+                "ops",
+                "teams",
+                "00000000-0000-0000-0000-000000000000"
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "204",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/provider/ops/teams/{id}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "provider",
+                    "ops",
+                    "teams",
+                    "{id}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_204\",\n  \"message\": \"information not found\",\n  \"content\": null,\n  \"errors\": []\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.request.headers.has('Accept')) {",
+          "    pm.request.headers.add({ key: 'Accept', value: 'application/json' });",
+          "}"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+    "name": "Chatbot",
+    "alias": "chatbot",
+    "description": "Customer AI chatbot — package advice, visits, and rebook",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Chatbot\\Providers\\ChatbotServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

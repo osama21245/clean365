@@ -1,0 +1,16 @@
+{
+    "name": "nwidart/chatbot",
+    "description": "Clean365 customer AI chatbot",
+    "authors": [],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Chatbot\\": ""
+        }
+    }
+}

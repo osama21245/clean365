@@ -1,0 +1,291 @@
+{
+  "info": {
+    "_postman_id": "clean365-customer-live-tracking",
+    "name": "Clean365 — Customer Live Tracking",
+    "description": "# Customer booking map / track\n\n1. (Optional) Customer login → `customer_token`\n2. Guest track booking: `POST .../track/{{readable_id}}` + phone\n3. Authenticated detail: `GET .../booking/{{booking_id}}`\n4. **Prefer live socket** (Laravel Reverb): subscribe `private-booking.{id}.tracking` after config `broadcasting.enabled`\n5. **HTTP fallback:** poll `GET .../booking/{{booking_id}}/agent-location`\n\n## When agent location streams / is available\n- booking not `completed` / `canceled`\n- `field_status` ∈ `on_the_way` | `arrived` | `in_progress`\n- agent pushed GPS via `PUT .../update-location`\n\nSocket events: `.BookingTrackingStarted`, `.BookingAgentLocationUpdated`, `.BookingTrackingEnded`\nAuth: `POST {{base_url}}/api/broadcasting/auth` with Bearer token.\nSee `docs/postman/LIVE_TRACKING.md`.\n",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "https://api.clean365.sa" }
+  ],
+  "item": [
+    {
+      "name": "01 — Auth (optional)",
+      "description": "Needed for authenticated booking detail + agent-location. Guest track works without login.",
+      "item": [
+        {
+          "name": "Customer Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "const token = j.content?.token || j.content?.access_token || j.token;",
+                  "if (token) pm.environment.set('customer_token', token);",
+                  "const uid = j.content?.id || j.content?.user?.id;",
+                  "if (uid) pm.environment.set('customer_id', uid);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email_or_phone\": \"{{customer_phone}}\",\n  \"password\": \"{{customer_password}}\"\n}"
+            },
+            "url": "{{base_url}}/api/v1/customer/auth/login",
+            "description": "Standard customer login."
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": "{{base_url}}/api/v1/customer/auth/login"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"response_code\": \"auth_login_200\",\n  \"message\": \"successfully logged in\",\n  \"content\": {\n    \"token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\",\n    \"is_active\": 1,\n    \"id\": \"customer-uuid\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 — Guest Track (no auth)",
+      "description": "Lookup booking by readable_id + service address contact phone.",
+      "item": [
+        {
+          "name": "Track Booking by Readable ID + Phone",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 404', () => pm.expect([200,404]).to.include(pm.response.code));",
+                  "if (pm.response.code === 200) {",
+                  "  const j = pm.response.json();",
+                  "  const b = j.content;",
+                  "  if (b?.id) pm.environment.set('booking_id', b.id);",
+                  "  if (b?.readable_id) pm.environment.set('readable_id', b.readable_id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{track_phone}}\"\n}"
+            },
+            "url": "{{base_url}}/api/v1/customer/booking/track/{{readable_id}}",
+            "description": "Guest booking track. Phone must match service_address.contact_person_number."
+          },
+          "response": [
+            {
+              "name": "200 — Found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"phone\": \"+9665XXXXXXXX\"\n}"
+                },
+                "url": "{{base_url}}/api/v1/customer/booking/track/1000123"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"id\": \"booking-uuid\",\n    \"readable_id\": \"1000123\",\n    \"booking_status\": \"ongoing\",\n    \"field_status\": \"on_the_way\",\n    \"progress_percent\": 20,\n    \"service_address\": {\n      \"lat\": 24.7136,\n      \"lon\": 46.6753,\n      \"address\": \"Riyadh, Example St\",\n      \"contact_person_number\": \"+9665XXXXXXXX\"\n    }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 — Authenticated Booking",
+      "description": "Logged-in customer: detail + list. Poll status separately from agent GPS.",
+      "item": [
+        {
+          "name": "Booking Detail",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customer_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/api/v1/customer/booking/{{booking_id}}",
+            "description": "Booking detail + service_address pin. For live agent pin use Agent Location."
+          },
+          "response": []
+        },
+        {
+          "name": "My Bookings List",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customer_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/customer/booking?limit=10&offset=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "customer", "booking"],
+              "query": [
+                { "key": "limit", "value": "10" },
+                { "key": "offset", "value": "1" }
+              ]
+            },
+            "description": "List bookings; pick an id then call Agent Location."
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 — Agent Live Location",
+      "description": "# Supervisor / agent live pin\n\nReturns primary agent GPS (supervisor owner preferred, else assigned serviceman).\n\n**Conditions for `available: true`:**\n1. Feature enabled (`CUSTOMER_AGENT_LOCATION_ENABLED`)\n2. `booking_status` not completed/canceled\n3. `field_status` ∈ on_the_way | arrived | in_progress\n4. Agent has `users.latitude/longitude` from `PUT .../update-location`\n\nPoll while `tracking_active` is true (every 5–10s).",
+      "item": [
+        {
+          "name": "Agent Location (authenticated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().content || {};",
+                  "pm.test('Has tracking flags', () => {",
+                  "  pm.expect(c).to.have.property('available');",
+                  "  pm.expect(c).to.have.property('tracking_active');",
+                  "  pm.expect(c).to.have.property('field_status');",
+                  "});",
+                  "if (c.available) {",
+                  "  pm.test('Agent coords present', () => {",
+                  "    pm.expect(c.agent.latitude).to.be.a('number');",
+                  "    pm.expect(c.agent.longitude).to.be.a('number');",
+                  "  });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customer_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/api/v1/customer/booking/{{booking_id}}/agent-location",
+            "description": "Authenticated. Booking must belong to the logged-in customer.\n\nPoll every 5–10s when `tracking_active` is true."
+          },
+          "response": [
+            {
+              "name": "200 — available",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{base_url}}/api/v1/customer/booking/{id}/agent-location"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"available\": true,\n    \"reason\": null,\n    \"tracking_active\": true,\n    \"booking_id\": \"booking-uuid\",\n    \"readable_id\": \"1000123\",\n    \"field_status\": \"on_the_way\",\n    \"booking_status\": \"accepted\",\n    \"progress_percent\": 20,\n    \"agent\": {\n      \"id\": \"user-uuid\",\n      \"role\": \"supervisor\",\n      \"name\": \"Ops Lead\",\n      \"phone\": \"+9665...\",\n      \"latitude\": 24.7201,\n      \"longitude\": 46.6802,\n      \"last_seen_at\": \"2026-09-06T16:20:00+00:00\",\n      \"is_online\": true,\n      \"provider_id\": \"provider-uuid\",\n      \"serviceman_id\": null\n    },\n    \"destination\": { \"lat\": 24.7136, \"lng\": 46.6753 }\n  }\n}"
+            },
+            {
+              "name": "200 — not_en_route",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{base_url}}/api/v1/customer/booking/{id}/agent-location"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"available\": false,\n    \"reason\": \"not_en_route\",\n    \"tracking_active\": false,\n    \"booking_id\": \"booking-uuid\",\n    \"readable_id\": \"1000123\",\n    \"field_status\": \"assigned\",\n    \"booking_status\": \"accepted\",\n    \"progress_percent\": 0,\n    \"agent\": null,\n    \"destination\": { \"lat\": 24.7136, \"lng\": 46.6753 }\n  }\n}"
+            },
+            {
+              "name": "200 — no_gps",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{base_url}}/api/v1/customer/booking/{id}/agent-location"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"available\": false,\n    \"reason\": \"no_gps\",\n    \"tracking_active\": true,\n    \"field_status\": \"on_the_way\",\n    \"agent\": {\n      \"id\": \"user-uuid\",\n      \"role\": \"supervisor\",\n      \"name\": \"Ops Lead\",\n      \"latitude\": null,\n      \"longitude\": null,\n      \"is_online\": false\n    },\n    \"destination\": { \"lat\": 24.7136, \"lng\": 46.6753 }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Agent Location (guest track)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{track_phone}}\"\n}"
+            },
+            "url": "{{base_url}}/api/v1/customer/booking/track/{{readable_id}}/agent-location",
+            "description": "Guest version. Same conditions as authenticated agent-location.\nBody phone must match service_address.contact_person_number."
+          },
+          "response": [
+            {
+              "name": "200 — available",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"phone\": \"+9665XXXXXXXX\"\n}"
+                },
+                "url": "{{base_url}}/api/v1/customer/booking/track/1000123/agent-location"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"available\": true,\n    \"reason\": null,\n    \"tracking_active\": true,\n    \"field_status\": \"on_the_way\",\n    \"agent\": {\n      \"role\": \"supervisor\",\n      \"latitude\": 24.7201,\n      \"longitude\": 46.6802,\n      \"is_online\": true\n    },\n    \"destination\": { \"lat\": 24.7136, \"lng\": 46.6753 }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

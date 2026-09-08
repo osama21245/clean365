@@ -1,0 +1,1873 @@
+{
+  "info": {
+    "_postman_id": "clean365-serviceman-mobile-v2",
+    "name": "Clean365 — Serviceman App",
+    "description": "# Clean365 Serviceman (Field Technician) API\n\nServiceman sees **assigned bookings** (direct `serviceman_id` or team membership).\n- **No** BookingTask, `/provider/booking-task/*`, or attendance write APIs — supervisor marks attendance.\n- On team jobs (`team_id` set): `can_update_booking_status=false`; status updates return `booking_status_supervisor_only_403`.\n- Detail may include `field_status`, `progress_percent`, `attendances` (read-only).\n- Use GPS via `PUT /serviceman/update-location` for admin Live Map only.\n",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.clean365.sa",
+      "type": "string"
+    },
+    {
+      "key": "serviceman_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "serviceman_phone",
+      "value": "+201022181170",
+      "type": "string"
+    },
+    {
+      "key": "serviceman_password",
+      "value": "password123",
+      "type": "string"
+    },
+    {
+      "key": "booking_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fcm_token",
+      "value": "SAMPLE_FCM_TOKEN",
+      "type": "string"
+    },
+    {
+      "key": "lat",
+      "value": "24.7136",
+      "type": "string"
+    },
+    {
+      "key": "lng",
+      "value": "46.6753",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 — Auth",
+      "item": [
+        {
+          "name": "Serviceman Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Body: `phone`, `password`. Saves `serviceman_token`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{serviceman_phone}}\",\n  \"password\": \"{{serviceman_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "if (j.content?.token) pm.collectionVariables.set('serviceman_token', j.content.token);"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Login Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/serviceman/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "serviceman",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"auth_login_200\",\n  \"message\": \"successfully logged in\",\n  \"content\": {\n    \"token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIyIiwianRpIjoiZ2hpamts...\",\n    \"is_active\": 1\n  },\n  \"errors\": []\n}"
+            },
+            {
+              "name": "401 Wrong Password",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/serviceman/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "serviceman",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"auth_login_401\",\n  \"message\": \"user credential does not match\",\n  \"content\": null,\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/forgot-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "forgot-password"
+              ]
+            },
+            "description": "Send OTP to phone/email.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identity\": \"{{serviceman_phone}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "OTP Verification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/otp-verification",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "otp-verification"
+              ]
+            },
+            "description": "Verify reset OTP.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identity\": \"{{serviceman_phone}}\",\n  \"otp\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/reset-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "reset-password"
+              ]
+            },
+            "description": "After OTP verified.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identity\": \"{{serviceman_phone}}\",\n  \"otp\": \"123456\",\n  \"password\": \"password123\",\n  \"confirm_password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "user",
+                "logout"
+              ]
+            },
+            "description": "Revoke token."
+          },
+          "response": [
+            {
+              "name": "200 Logout",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/user/logout",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "user",
+                    "logout"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"auth_logout_200\",\n  \"message\": \"successfully logged out\",\n  \"content\": null,\n  \"errors\": []\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 — Home & Profile",
+      "item": [
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "dashboard"
+              ],
+              "query": [
+                {
+                  "key": "sections",
+                  "value": "top_cards,recent_bookings",
+                  "description": "Required"
+                },
+                {
+                  "key": "year",
+                  "value": "2026",
+                  "description": ""
+                },
+                {
+                  "key": "month",
+                  "value": "9",
+                  "description": ""
+                }
+              ]
+            },
+            "description": "Query `sections` = comma list: `top_cards,recent_bookings,booking_stats`."
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/serviceman/dashboard",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "serviceman",
+                    "dashboard"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"top_cards\": {\n      \"total_bookings\": 40,\n      \"ongoing_bookings\": 2,\n      \"completed_bookings\": 35,\n      \"canceled_bookings\": 3\n    },\n    \"recent_bookings\": [\n      {\n        \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n        \"readable_id\": 100042,\n        \"booking_status\": \"ongoing\",\n        \"field_status\": \"in_progress\",\n        \"progress_percent\": 70,\n        \"service_schedule\": \"2026-07-12 09:00:00\",\n        \"title\": \"Deep Cleaning\",\n        \"customer\": {\n          \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n          \"name\": \"Fatma Ibrahim\",\n          \"phone\": \"+201012345678\"\n        },\n        \"property_type\": \"Apartment\",\n        \"location_text\": \"15 Nile Corniche, Zamalek, Cairo\",\n        \"team\": {\n          \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n          \"name\": \"Morning Cleaning Crew\",\n          \"is_active\": true,\n          \"members_count\": 2,\n          \"members\": [\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n              \"name\": \"Ahmed Hassan\",\n              \"phone\": \"+201000000001\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n              \"is_active\": 1\n            },\n            {\n              \"id\": \"d5e6f7a8-b9c0-1234-def0-345678901234\",\n              \"name\": \"Sara Mahmoud\",\n              \"phone\": \"+201000000002\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n              \"is_active\": 1\n            }\n          ]\n        },\n        \"is_paid\": 1,\n        \"total_booking_amount\": 450.0,\n        \"customer_note\": \"Please focus on kitchen and bathrooms.\",\n        \"coordinates\": {\n          \"lat\": 30.04442,\n          \"lng\": 31.235712\n        },\n        \"payment_method\": \"cash_after_service\",\n        \"services\": [\n          {\n            \"id\": \"svc-detail-001\",\n            \"service_id\": \"f2a3b4c5-d6e7-8901-5678-012345678901\",\n            \"service_name\": \"Deep Cleaning\",\n            \"quantity\": 1,\n            \"total_cost\": 450.0\n          }\n        ],\n        \"status_histories\": [\n          {\n            \"booking_status\": \"ongoing\",\n            \"changed_by\": \"b2c3d4e5-f6a7-8901-bcde-f12345678901\",\n            \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n          }\n        ],\n        \"attendances\": [\n          {\n            \"id\": \"b8c9d0e1-f2a3-4567-1234-678901234567\",\n            \"serviceman_id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n            \"is_attended\": true,\n            \"attended_at\": \"2026-07-11T14:30:00.000000Z\"\n          }\n        ]\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Booking Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/dashboard/booking-statistics",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "dashboard",
+                "booking-statistics"
+              ],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2026",
+                  "description": ""
+                },
+                {
+                  "key": "stats_type",
+                  "value": "full_year",
+                  "description": "full_year|full_month"
+                }
+              ]
+            },
+            "description": "Yearly/monthly chart data."
+          }
+        },
+        {
+          "name": "My Info",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/info",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "info"
+              ]
+            },
+            "description": "Current serviceman profile."
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/serviceman/info",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "serviceman",
+                    "info"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"id\": \"d4e5f6a7-b8c9-0123-def0-234567890123\",\n    \"first_name\": \"Ahmed\",\n    \"last_name\": \"Hassan\",\n    \"full_name\": \"Ahmed Hassan\",\n    \"email\": \"ahmed.hassan@clean365.tech\",\n    \"phone\": \"+201000000001\",\n    \"profile_image_full_path\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n    \"is_active\": 1,\n    \"serviceman_id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n    \"user_id\": \"d4e5f6a7-b8c9-0123-def0-234567890123\",\n    \"provider_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n    \"user_type\": \"provider-serviceman\"\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/update/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "update",
+                "profile"
+              ]
+            },
+            "description": "multipart profile fields.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "first_name",
+                  "value": "Ahmed",
+                  "type": "text",
+                  "description": ""
+                },
+                {
+                  "key": "last_name",
+                  "value": "Hassan",
+                  "type": "text",
+                  "description": ""
+                },
+                {
+                  "key": "phone",
+                  "value": "{{serviceman_phone}}",
+                  "type": "text",
+                  "description": ""
+                },
+                {
+                  "key": "profile_image",
+                  "value": "",
+                  "type": "file",
+                  "description": "Optional"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Profile Info",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/profile/info",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "profile",
+                "info"
+              ]
+            },
+            "description": "Profile info update.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Ahmed\",\n  \"last_name\": \"Hassan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/profile/change-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "profile",
+                "change-password"
+              ]
+            },
+            "description": "Body: current_password, password, confirm_password.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current_password\": \"{{serviceman_password}}\",\n  \"password\": \"password123\",\n  \"confirm_password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update FCM Token",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/update/fcm-token",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "update",
+                "fcm-token"
+              ]
+            },
+            "description": "Body: `{ \"fcm_token\": \"...\" }`",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fcm_token\": \"{{fcm_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/serviceman/update/fcm-token",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "serviceman",
+                    "update",
+                    "fcm-token"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_update_200\",\n  \"message\": \"successfully updated\",\n  \"content\": null,\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Location (live map)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/update-location",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "update-location"
+              ]
+            },
+            "description": "GPS ping for **admin Live Map** (`/admin/live-map`).\n- Saves `users.latitude` / `longitude` and always refreshes `last_seen_at`.\n- Call every **5–10s** while on an active field job; every **2–3 min** as heartbeat.\n- Rate limit: ~30 writes/min (`429` if exceeded).\n- **Not** attendance check-in (supervisor marks attendance).\nBody: `{ \"latitude\": number, \"longitude\": number }` (both optional for heartbeat-only).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"latitude\": \"{{lat}}\",\n  \"longitude\": \"{{lng}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/serviceman/update-location",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "serviceman",
+                    "update-location"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_update_200\",\n  \"message\": \"successfully updated\",\n  \"content\": {\n    \"latitude\": 24.7136,\n    \"longitude\": 46.6753,\n    \"last_seen_at\": \"2026-07-11T14:30:00.000000Z\"\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Location Heartbeat (no coords)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/update-location",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "update-location"
+              ]
+            },
+            "description": "Presence-only ping — refreshes `last_seen_at` without changing coords.\nEmpty body `{}` is valid.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/serviceman/update-location",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "serviceman",
+                    "update-location"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_update_200\",\n  \"message\": \"successfully updated\",\n  \"content\": {\n    \"latitude\": 24.7136,\n    \"longitude\": 46.6753,\n    \"last_seen_at\": \"2026-07-11T14:30:00.000000Z\"\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Change Language",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/change-language",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "change-language"
+              ]
+            },
+            "description": "Body: `{ \"lang\": \"ar\"|\"en\" }`",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lang\": \"ar\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "App Config",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/config/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "config"
+              ]
+            },
+            "description": "Public config (no auth required)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 — Bookings",
+      "description": "Serviceman booking list/detail.\nTeam bookings: read-only status (`can_update_booking_status=false`); may include `field_status`, `progress_percent`, `attendances`.\nNo task / attendance write APIs — supervisor owns field ops.",
+      "item": [
+        {
+          "name": "List My Bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/booking/list",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "booking",
+                "list"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Required"
+                },
+                {
+                  "key": "offset",
+                  "value": "1",
+                  "description": "Required"
+                },
+                {
+                  "key": "booking_status",
+                  "value": "all",
+                  "description": "pending|accepted|ongoing|completed|canceled|all"
+                }
+              ]
+            },
+            "description": "Query: booking_status, limit, offset."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j=pm.response.json();",
+                  "const d=j.content?.data||j.content?.bookings?.data;",
+                  "if(d?.[0]?.id) pm.collectionVariables.set('booking_id', d[0].id);"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/serviceman/booking/list",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "serviceman",
+                    "booking",
+                    "list"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"current_page\": 1,\n    \"data\": [\n      {\n        \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n        \"readable_id\": 100042,\n        \"booking_status\": \"ongoing\",\n        \"field_status\": \"in_progress\",\n        \"progress_percent\": 70,\n        \"service_schedule\": \"2026-07-12 09:00:00\",\n        \"title\": \"Deep Cleaning\",\n        \"customer\": {\n          \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n          \"name\": \"Fatma Ibrahim\",\n          \"phone\": \"+201012345678\"\n        },\n        \"property_type\": \"Apartment\",\n        \"location_text\": \"15 Nile Corniche, Zamalek, Cairo\",\n        \"team\": {\n          \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n          \"name\": \"Morning Cleaning Crew\",\n          \"is_active\": true,\n          \"members_count\": 2,\n          \"members\": [\n            {\n              \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n              \"name\": \"Ahmed Hassan\",\n              \"phone\": \"+201000000001\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n              \"is_active\": 1\n            },\n            {\n              \"id\": \"d5e6f7a8-b9c0-1234-def0-345678901234\",\n              \"name\": \"Sara Mahmoud\",\n              \"phone\": \"+201000000002\",\n              \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n              \"is_active\": 1\n            }\n          ]\n        },\n        \"is_paid\": 1,\n        \"total_booking_amount\": 450.0,\n        \"customer_note\": \"Please focus on kitchen and bathrooms.\",\n        \"coordinates\": {\n          \"lat\": 30.04442,\n          \"lng\": 31.235712\n        },\n        \"payment_method\": \"cash_after_service\",\n        \"services\": [\n          {\n            \"id\": \"svc-detail-001\",\n            \"service_id\": \"f2a3b4c5-d6e7-8901-5678-012345678901\",\n            \"service_name\": \"Deep Cleaning\",\n            \"quantity\": 1,\n            \"total_cost\": 450.0\n          }\n        ],\n        \"status_histories\": [\n          {\n            \"booking_status\": \"ongoing\",\n            \"changed_by\": \"b2c3d4e5-f6a7-8901-bcde-f12345678901\",\n            \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n          }\n        ],\n        \"attendances\": [\n          {\n            \"id\": \"b8c9d0e1-f2a3-4567-1234-678901234567\",\n            \"serviceman_id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n            \"is_attended\": true,\n            \"attended_at\": \"2026-07-11T14:30:00.000000Z\"\n          }\n        ]\n      }\n    ],\n    \"first_page_url\": \"/api/v1/serviceman/booking/list?offset=1\",\n    \"from\": 1,\n    \"last_page\": 1,\n    \"last_page_url\": \"/api/v1/serviceman/booking/list?offset=1\",\n    \"links\": [\n      {\n        \"url\": null,\n        \"label\": \"&laquo; Previous\",\n        \"active\": false\n      },\n      {\n        \"url\": \"/api/v1/serviceman/booking/list?offset=1\",\n        \"label\": \"1\",\n        \"active\": true\n      },\n      {\n        \"url\": null,\n        \"label\": \"Next &raquo;\",\n        \"active\": false\n      }\n    ],\n    \"next_page_url\": null,\n    \"path\": \"/api/v1/serviceman/booking/list\",\n    \"per_page\": 10,\n    \"prev_page_url\": null,\n    \"to\": 1,\n    \"total\": 1\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Booking Detail (team)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/booking/detail/{{booking_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "booking",
+                "detail",
+                "{{booking_id}}"
+              ]
+            },
+            "description": "Team order — `can_update_booking_status=false`. Includes team + attendances (read-only)."
+          },
+          "response": [
+            {
+              "name": "200 Team",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/serviceman/booking/detail/{id}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "serviceman",
+                    "booking",
+                    "detail",
+                    "{id}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"booking\": {\n      \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n      \"readable_id\": 100042,\n      \"booking_status\": \"ongoing\",\n      \"field_status\": \"in_progress\",\n      \"progress_percent\": 70,\n      \"service_schedule\": \"2026-07-12 09:00:00\",\n      \"title\": \"Deep Cleaning\",\n      \"customer\": {\n        \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n        \"name\": \"Fatma Ibrahim\",\n        \"phone\": \"+201012345678\"\n      },\n      \"property_type\": \"Apartment\",\n      \"location_text\": \"15 Nile Corniche, Zamalek, Cairo\",\n      \"team\": {\n        \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n        \"name\": \"Morning Cleaning Crew\",\n        \"is_active\": true,\n        \"members_count\": 2,\n        \"members\": [\n          {\n            \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n            \"name\": \"Ahmed Hassan\",\n            \"phone\": \"+201000000001\",\n            \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n            \"is_active\": 1\n          },\n          {\n            \"id\": \"d5e6f7a8-b9c0-1234-def0-345678901234\",\n            \"name\": \"Sara Mahmoud\",\n            \"phone\": \"+201000000002\",\n            \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n            \"is_active\": 1\n          }\n        ]\n      },\n      \"is_paid\": 1,\n      \"total_booking_amount\": 450.0,\n      \"customer_note\": \"Please focus on kitchen and bathrooms.\",\n      \"coordinates\": {\n        \"lat\": 30.04442,\n        \"lng\": 31.235712\n      },\n      \"payment_method\": \"cash_after_service\",\n      \"services\": [\n        {\n          \"id\": \"svc-detail-001\",\n          \"service_id\": \"f2a3b4c5-d6e7-8901-5678-012345678901\",\n          \"service_name\": \"Deep Cleaning\",\n          \"quantity\": 1,\n          \"total_cost\": 450.0\n        }\n      ],\n      \"status_histories\": [\n        {\n          \"booking_status\": \"ongoing\",\n          \"changed_by\": \"b2c3d4e5-f6a7-8901-bcde-f12345678901\",\n          \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n        }\n      ],\n      \"attendances\": [\n        {\n          \"id\": \"b8c9d0e1-f2a3-4567-1234-678901234567\",\n          \"serviceman_id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n          \"is_attended\": true,\n          \"attended_at\": \"2026-07-11T14:30:00.000000Z\"\n        }\n      ],\n      \"can_update_booking_status\": false\n    },\n    \"provider_serviceman_can_cancel_booking\": 0,\n    \"provider_serviceman_can_edit_booking\": 0\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Booking Detail (solo)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/booking/detail/{{booking_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "booking",
+                "detail",
+                "{{booking_id}}"
+              ]
+            },
+            "description": "Solo assignment — status update may be allowed."
+          },
+          "response": [
+            {
+              "name": "200 Solo",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/serviceman/booking/detail/{id}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "serviceman",
+                    "booking",
+                    "detail",
+                    "{id}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"default_200\",\n  \"message\": \"successfully data fetched\",\n  \"content\": {\n    \"booking\": {\n      \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n      \"readable_id\": 100042,\n      \"booking_status\": \"accepted\",\n      \"field_status\": null,\n      \"progress_percent\": 0,\n      \"service_schedule\": \"2026-07-12 09:00:00\",\n      \"title\": \"Deep Cleaning\",\n      \"customer\": {\n        \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n        \"name\": \"Fatma Ibrahim\",\n        \"phone\": \"+201012345678\"\n      },\n      \"property_type\": \"Apartment\",\n      \"location_text\": \"15 Nile Corniche, Zamalek, Cairo\",\n      \"team\": null,\n      \"is_paid\": 1,\n      \"total_booking_amount\": 450.0,\n      \"customer_note\": \"Please focus on kitchen and bathrooms.\",\n      \"coordinates\": {\n        \"lat\": 30.04442,\n        \"lng\": 31.235712\n      },\n      \"payment_method\": \"cash_after_service\",\n      \"services\": [\n        {\n          \"id\": \"svc-detail-001\",\n          \"service_id\": \"f2a3b4c5-d6e7-8901-5678-012345678901\",\n          \"service_name\": \"Deep Cleaning\",\n          \"quantity\": 1,\n          \"total_cost\": 450.0\n        }\n      ],\n      \"status_histories\": [\n        {\n          \"booking_status\": \"accepted\",\n          \"changed_by\": \"b2c3d4e5-f6a7-8901-bcde-f12345678901\",\n          \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n        }\n      ],\n      \"can_update_booking_status\": true,\n      \"serviceman_id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n      \"attendances\": []\n    },\n    \"provider_serviceman_can_cancel_booking\": 0,\n    \"provider_serviceman_can_edit_booking\": 0\n  },\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Booking Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/booking/status-update/{{booking_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "booking",
+                "status-update",
+                "{{booking_id}}"
+              ]
+            },
+            "description": "Solo jobs only. Team jobs return `booking_status_supervisor_only_403`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_status\": \"ongoing\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/serviceman/booking/status-update/{id}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "serviceman",
+                    "booking",
+                    "status-update",
+                    "{id}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"status_update_success_200\",\n  \"message\": \"booking status updated successfully\",\n  \"content\": {\n    \"id\": \"f6a7b8c9-d0e1-2345-f012-456789012345\",\n    \"readable_id\": 100042,\n    \"booking_status\": \"ongoing\",\n    \"field_status\": \"in_progress\",\n    \"progress_percent\": 70,\n    \"service_schedule\": \"2026-07-12 09:00:00\",\n    \"title\": \"Deep Cleaning\",\n    \"customer\": {\n      \"id\": \"d0e1f2a3-b4c5-6789-3456-890123456789\",\n      \"name\": \"Fatma Ibrahim\",\n      \"phone\": \"+201012345678\"\n    },\n    \"property_type\": \"Apartment\",\n    \"location_text\": \"15 Nile Corniche, Zamalek, Cairo\",\n    \"team\": {\n      \"id\": \"e5f6a7b8-c9d0-1234-ef01-345678901234\",\n      \"name\": \"Morning Cleaning Crew\",\n      \"is_active\": true,\n      \"members_count\": 2,\n      \"members\": [\n        {\n          \"id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n          \"name\": \"Ahmed Hassan\",\n          \"phone\": \"+201000000001\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n          \"is_active\": 1\n        },\n        {\n          \"id\": \"d5e6f7a8-b9c0-1234-def0-345678901234\",\n          \"name\": \"Sara Mahmoud\",\n          \"phone\": \"+201000000002\",\n          \"profile_image\": \"https://clean365.tech/storage/app/public/serviceman/profile/2026-07-11-abc123.png\",\n          \"is_active\": 1\n        }\n      ]\n    },\n    \"is_paid\": 1,\n    \"total_booking_amount\": 450.0,\n    \"customer_note\": \"Please focus on kitchen and bathrooms.\",\n    \"coordinates\": {\n      \"lat\": 30.04442,\n      \"lng\": 31.235712\n    },\n    \"payment_method\": \"cash_after_service\",\n    \"services\": [\n      {\n        \"id\": \"svc-detail-001\",\n        \"service_id\": \"f2a3b4c5-d6e7-8901-5678-012345678901\",\n        \"service_name\": \"Deep Cleaning\",\n        \"quantity\": 1,\n        \"total_cost\": 450.0\n      }\n    ],\n    \"status_histories\": [\n      {\n        \"booking_status\": \"ongoing\",\n        \"changed_by\": \"b2c3d4e5-f6a7-8901-bcde-f12345678901\",\n        \"created_at\": \"2026-07-11T14:30:00.000000Z\"\n      }\n    ],\n    \"attendances\": [\n      {\n        \"id\": \"b8c9d0e1-f2a3-4567-1234-678901234567\",\n        \"serviceman_id\": \"c3d4e5f6-a7b8-9012-cdef-123456789012\",\n        \"is_attended\": true,\n        \"attended_at\": \"2026-07-11T14:30:00.000000Z\"\n      }\n    ]\n  },\n  \"errors\": []\n}"
+            },
+            {
+              "name": "403 Team",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/serviceman/booking/status-update/{id}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "serviceman",
+                    "booking",
+                    "status-update",
+                    "{id}"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"booking_status_supervisor_only_403\",\n  \"message\": \"Only the supervisor can update booking status for team orders\",\n  \"content\": null,\n  \"errors\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Single Repeat Status Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/booking/single-repeat-status-update/{{booking_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "booking",
+                "single-repeat-status-update",
+                "{{booking_id}}"
+              ]
+            },
+            "description": "Repeat booking instance status.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_status\": \"completed\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Payment Status Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/booking/payment-status-update/{{booking_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "booking",
+                "payment-status-update",
+                "{{booking_id}}"
+              ]
+            },
+            "description": "Mark payment collected when allowed.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payment_status\": \"paid\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get Service Info",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/booking/service/info",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "booking",
+                "service",
+                "info"
+              ],
+              "query": [
+                {
+                  "key": "service_id",
+                  "value": "",
+                  "description": ""
+                },
+                {
+                  "key": "zone_id",
+                  "value": "",
+                  "description": ""
+                }
+              ]
+            },
+            "description": "Service variants for edit flows."
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 — Notifications",
+      "item": [
+        {
+          "name": "Push Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/push-notifications",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "push-notifications"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": ""
+                },
+                {
+                  "key": "offset",
+                  "value": "1",
+                  "description": ""
+                }
+              ]
+            },
+            "description": "Push notification list."
+          }
+        },
+        {
+          "name": "Inbox Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/inbox-notifications",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "inbox-notifications"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": ""
+                },
+                {
+                  "key": "offset",
+                  "value": "1",
+                  "description": ""
+                }
+              ]
+            },
+            "description": "In-app inbox."
+          }
+        },
+        {
+          "name": "Inbox Notification Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/inbox-notifications/{{booking_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "inbox-notifications",
+                "{{booking_id}}"
+              ]
+            },
+            "description": "Replace id with notification id."
+          }
+        },
+        {
+          "name": "Ack Broadcast",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/broadcasts/ack",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "broadcasts",
+                "ack"
+              ]
+            },
+            "description": "Acknowledge ad/broadcast.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"broadcast_id\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 — Errors",
+      "item": [
+        {
+          "name": "401 — Missing Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/info",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "info"
+              ]
+            },
+            "description": "No Authorization."
+          },
+          "response": [
+            {
+              "name": "401",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/serviceman/info",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "serviceman",
+                    "info"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Unauthenticated.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "403 — Team Status Supervisor Only",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{serviceman_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/serviceman/booking/status-update/{{booking_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "serviceman",
+                "booking",
+                "status-update",
+                "{{booking_id}}"
+              ]
+            },
+            "description": "Team-assigned booking — only supervisor updates status.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_status\": \"ongoing\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "403",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/serviceman/booking/status-update/{id}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "serviceman",
+                    "booking",
+                    "status-update",
+                    "{id}"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"response_code\": \"booking_status_supervisor_only_403\",\n  \"message\": \"Only the supervisor can update booking status for team orders\",\n  \"content\": null,\n  \"errors\": []\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.request.headers.has('Accept')) {",
+          "    pm.request.headers.add({ key: 'Accept', value: 'application/json' });",
+          "}"
+        ]
+      }
+    }
+  ]
+}

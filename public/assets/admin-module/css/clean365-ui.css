@@ -1,0 +1,1490 @@
+/**
+ * Clean 365 — Admin UI Component System (Phase 2)
+ * Landing-aligned: pill buttons, soft cards, chip filters, spacious layout.
+ */
+
+:root {
+    --c365-radius-sm: 8px;
+    --c365-radius-md: 12px;
+    --c365-radius-lg: 16px;
+    --c365-radius-xl: 20px;
+    --c365-radius-pill: 999px;
+
+    --c365-shadow-xs: 0 1px 3px rgba(15, 36, 64, 0.06);
+    --c365-shadow-sm: 0 4px 16px rgba(15, 36, 64, 0.07);
+    --c365-shadow-md: 0 8px 28px rgba(15, 36, 64, 0.1);
+    --c365-shadow-lg: 0 12px 40px rgba(15, 36, 64, 0.12);
+
+    --c365-space-section: 1.75rem;
+    --c365-transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Global page headers (all admin pages) ───────────────── */
+.main-content > .container-fluid > .page-title-wrap:first-child,
+.main-content > .container-fluid > .row:first-child .page-title-wrap {
+    padding-bottom: 0.25rem;
+}
+
+.main-content .page-title-wrap .page-title {
+    position: relative;
+    padding-inline-start: 0.875rem;
+}
+
+.main-content .page-title-wrap .page-title::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0.15em;
+    bottom: 0.15em;
+    width: 3px;
+    border-radius: var(--c365-radius-pill);
+    background: linear-gradient(180deg, var(--c365-green), var(--c365-navy));
+}
+
+body {
+    font-family: var(--bs-font-sans-serif);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: 0;
+}
+
+[dir="rtl"] body {
+    font-family: "IBM Plex Sans Arabic", "Public Sans", system-ui, sans-serif;
+}
+
+.main-content {
+    padding-bottom: 2rem;
+}
+
+.container-fluid {
+    padding-inline: 1.25rem;
+}
+
+@media (min-width: 1200px) {
+    .container-fluid {
+        padding-inline: 1.75rem;
+    }
+}
+
+.page-title-wrap {
+    margin-bottom: var(--c365-space-section) !important;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    line-height: 1.3;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.c365-page-subtitle {
+    margin: 0;
+    color: rgba(27, 58, 107, 0.55);
+    font-size: 0.9375rem;
+    font-weight: 400;
+}
+
+[data-bs-theme="dark"] .c365-page-subtitle {
+    color: var(--text-light-color);
+}
+
+h4, .card-header h5, .card-body > h4 {
+    color: var(--c365-navy);
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+[data-bs-theme="dark"] h4,
+[data-bs-theme="dark"] .card-header h5 {
+    color: var(--bs-dark);
+}
+
+/* ── Sidebar — modern, light typography ──────────────────── */
+.aside-header {
+    padding-block: 0.875rem !important;
+    min-height: 4rem;
+}
+
+.aside-header .logo {
+    flex: 1;
+    min-width: 0;
+    background: transparent !important;
+    border-radius: 0;
+    padding: 0 !important;
+    box-shadow: none !important;
+}
+
+.aside-header .logo .main-logo,
+.aside-header .logo .c365-brand-logo {
+    max-height: 2.5rem !important;
+    max-width: 9rem !important;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    filter: none !important;
+    display: block;
+}
+
+.aside .user-profile {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+}
+
+.aside .user-profile .card-title {
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+}
+
+.aside .user-profile .card-text {
+    font-size: 0.75rem !important;
+    font-weight: 400 !important;
+}
+
+.aside-body .nav li {
+    padding: 0.125rem 0;
+}
+
+.aside-body .nav li.nav-category {
+    font-size: 0.6875rem !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.06em;
+    padding-top: 1rem;
+    padding-bottom: 0.25rem;
+    margin-bottom: 0;
+}
+
+.aside-body .nav li > a {
+    border-radius: 8px;
+    padding: 0.5rem 0.625rem;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.aside-body .nav li > a.active-menu {
+    font-weight: 500;
+}
+
+.aside-body .nav ul.sub-menu li > a {
+    font-size: 0.78125rem;
+    font-weight: 400;
+    padding: 0.4rem 0.625rem;
+}
+
+.active-menu {
+    border-radius: 8px !important;
+}
+
+/* ── Header — modern top bar + search ────────────────────── */
+.header {
+    backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.98) !important;
+    border-bottom: 1px solid var(--c365-border);
+    box-shadow: 0 1px 0 rgba(15, 36, 64, 0.04);
+    min-height: 4rem;
+}
+
+.header .container-fluid {
+    padding-inline: 1.25rem;
+}
+
+.header-right .nav {
+    gap: 0.5rem !important;
+}
+
+.header-right .nav > li > a,
+.header-right .nav > li > button {
+    border-radius: 10px;
+}
+
+.c365-search-trigger,
+#modalOpener.c365-search-trigger {
+    min-width: 12.5rem;
+    height: 2.5rem;
+    background: #f1f5f9 !important;
+    border: 1px solid var(--c365-border) !important;
+    border-radius: 10px !important;
+    color: #64748b !important;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    box-shadow: none !important;
+    transition: background var(--c365-transition), border-color var(--c365-transition), box-shadow var(--c365-transition);
+}
+
+.c365-search-trigger:hover,
+#modalOpener.c365-search-trigger:hover {
+    background: #fff !important;
+    border-color: rgba(27, 58, 107, 0.22) !important;
+    box-shadow: 0 2px 10px rgba(15, 36, 64, 0.08) !important;
+    color: var(--c365-navy) !important;
+}
+
+.c365-search-trigger__icon {
+    font-size: 1.125rem !important;
+    color: #94a3b8;
+}
+
+.c365-search-trigger__label {
+    color: #64748b;
+    font-weight: 400;
+}
+
+.c365-search-trigger__kbd {
+    margin-inline-start: auto;
+    align-items: center;
+    padding: 0.15rem 0.45rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1.2;
+    color: #94a3b8;
+    background: #fff;
+    border: 1px solid var(--c365-border);
+    border-radius: 6px;
+}
+
+.header-right .topbar-link,
+.header-right .lagn-drop-btn {
+    height: 2.5rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--c365-border);
+    border-radius: 10px;
+    background: #fff;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: var(--c365-navy) !important;
+    transition: var(--c365-transition);
+}
+
+.header-right .topbar-link:hover,
+.header-right .lagn-drop-btn:hover {
+    background: #f8fafc;
+    border-color: rgba(27, 58, 107, 0.2);
+}
+
+.header-right .count-btn,
+.header-right .header-icon,
+.header-right .user-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--c365-border);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--c365-navy);
+    transition: var(--c365-transition);
+}
+
+.header-right .count-btn:hover,
+.header-right .header-icon:hover {
+    background: #f8fafc;
+    border-color: rgba(27, 58, 107, 0.2);
+}
+
+.header-right .count-btn .material-icons {
+    font-size: 1.25rem;
+}
+
+.header-right .user-icon img {
+    width: 1.75rem !important;
+    height: 1.75rem !important;
+}
+
+.header-toogle-menu .aside-toggle {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--c365-border) !important;
+    border-radius: 10px !important;
+    background: #fff !important;
+    color: var(--c365-navy) !important;
+}
+
+/* ── Cards (landing service-card feel) ───────────────────── */
+.card {
+    border: none !important;
+    border-radius: var(--c365-radius-md) !important;
+    box-shadow: var(--c365-shadow-sm) !important;
+    background: #fff;
+    transition: box-shadow var(--c365-transition), transform var(--c365-transition);
+    overflow: hidden;
+}
+
+.card:hover {
+    box-shadow: var(--c365-shadow-md) !important;
+}
+
+.card-header {
+    padding: 1.125rem 1.25rem;
+    background: transparent;
+    border-bottom: 1px solid var(--c365-border);
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+.card-body.p-30 {
+    padding: 1.75rem !important;
+}
+
+[data-bs-theme="dark"] .card {
+    background: var(--bs-white);
+    box-shadow: var(--c365-shadow-xs) !important;
+}
+
+/* ── Buttons (pill CTAs like landing) ────────────────────── */
+.btn,
+.wizard .actions ul a {
+    border-radius: var(--c365-radius-pill) !important;
+    padding: 0.625rem 1.375rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    transition: transform var(--c365-transition), box-shadow var(--c365-transition), background var(--c365-transition);
+}
+
+.btn-sm {
+    padding: 0.4375rem 1rem;
+    font-size: 0.8125rem;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.75rem;
+}
+
+.btn--primary,
+.btn--success {
+    text-transform: none;
+}
+
+.btn-soft--danger,
+.btn-soft--primary,
+.btn-soft--success {
+    border-radius: var(--c365-radius-pill) !important;
+}
+
+.btn--secondary,
+.btn--outline-secondary {
+    border-radius: var(--c365-radius-pill) !important;
+    border: 1px solid var(--c365-border) !important;
+}
+
+.btn--light-primary {
+    border-radius: var(--c365-radius-pill) !important;
+    background: var(--bs-primary-light-bg);
+    color: var(--c365-navy);
+}
+
+/* ── Forms (rounded, clean) ──────────────────────────────── */
+.form-control,
+.form-select,
+.theme-input-style,
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+    border-radius: var(--c365-radius-sm) !important;
+    border-color: var(--c365-border) !important;
+    min-height: 2.75rem;
+    transition: border-color var(--c365-transition), box-shadow var(--c365-transition);
+}
+
+.form-control:focus,
+.theme-input-style:focus {
+    border-color: var(--c365-navy) !important;
+    box-shadow: 0 0 0 3px rgba(27, 58, 107, 0.1) !important;
+}
+
+.form-floating > .form-control,
+.form-floating > .form-select {
+    border-radius: var(--c365-radius-sm) !important;
+}
+
+label,
+.form-label,
+.ff-field__label-text {
+    font-weight: 500;
+    color: var(--c365-navy);
+    font-size: 0.8125rem;
+}
+
+[data-bs-theme="dark"] label {
+    color: var(--bs-body-color);
+}
+
+/* Search bars (landing filter bar style) */
+.search-form__input,
+.theme-input-style.search-form__input,
+.data-table-top input[type="search"] {
+    border-radius: var(--c365-radius-pill) !important;
+    background: #fff;
+    border: 1px solid var(--c365-border) !important;
+    padding-inline: 1rem;
+}
+
+.data-table-top form.border.rounded {
+    border-radius: var(--c365-radius-pill) !important;
+    overflow: hidden;
+    border-color: var(--c365-border) !important;
+    box-shadow: var(--c365-shadow-xs);
+}
+
+/* ── Chip / pill filters (landing categories) ────────────── */
+.option-select-btn label span {
+    border-radius: var(--c365-radius-pill) !important;
+    border: 1px solid var(--c365-border);
+    background: #fff !important;
+    padding: 0.5rem 1.125rem !important;
+    font-weight: 500;
+    transition: var(--c365-transition);
+}
+
+.option-select-btn label input:checked ~ span {
+    background: var(--c365-navy) !important;
+    color: #fff !important;
+    border-color: var(--c365-navy);
+    box-shadow: 0 2px 8px rgba(27, 58, 107, 0.2);
+}
+
+/* ── Tabs as pills ───────────────────────────────────────── */
+.nav--tabs__style2 {
+    gap: 0.5rem;
+    border: none;
+    background: rgba(27, 58, 107, 0.04);
+    padding: 0.375rem;
+    border-radius: var(--c365-radius-pill);
+    display: inline-flex;
+    flex-wrap: wrap;
+}
+
+.nav--tabs__style2 .nav-link {
+    border-radius: var(--c365-radius-pill) !important;
+    padding: 0.5rem 1.125rem !important;
+    color: var(--c365-navy);
+    font-weight: 500;
+}
+
+.nav--tabs__style2 .nav-link.active {
+    box-shadow: var(--c365-shadow-xs);
+}
+
+.nav--tabs .nav-link {
+    font-weight: 500;
+}
+
+.nav--tabs .nav-link.active {
+    font-weight: 700;
+}
+
+/* ── Tables ──────────────────────────────────────────────── */
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table thead th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.875rem 1rem;
+    border: none;
+    background: rgba(27, 58, 107, 0.04);
+}
+
+.table thead th:first-child {
+    border-radius: var(--c365-radius-sm) 0 0 var(--c365-radius-sm);
+}
+
+.table thead th:last-child {
+    border-radius: 0 var(--c365-radius-sm) var(--c365-radius-sm) 0;
+}
+
+.table tbody td {
+    padding: 0.875rem 1rem;
+    vertical-align: middle;
+    border-color: var(--c365-border);
+}
+
+.table tbody tr {
+    transition: background var(--c365-transition);
+}
+
+.table-responsive {
+    border-radius: var(--c365-radius-md);
+}
+
+/* ── Badges (pill) ───────────────────────────────────────── */
+.badge,
+.badge.rounded-pill {
+    border-radius: var(--c365-radius-pill) !important;
+    font-weight: 600;
+    padding: 0.35em 0.75em;
+    letter-spacing: 0.02em;
+}
+
+/* ── Stat cards (dashboard — landing service cards) ──────── */
+.c365-stat-grid .business-summary {
+    border-radius: var(--c365-radius-md);
+    padding: 1.5rem 1.5rem 1.75rem;
+    min-height: 8.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.c365-stat-grid .business-summary::before {
+    content: "";
+    position: absolute;
+    inset-inline-end: -1rem;
+    inset-block-start: -1rem;
+    width: 6rem;
+    height: 6rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.c365-stat-grid .business-summary h2 {
+    font-size: 1.625rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+}
+
+.c365-stat-grid .business-summary h3 {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    opacity: 0.88;
+    text-transform: capitalize;
+}
+
+.c365-stat-grid .business-summary .absolute-img {
+    display: none;
+}
+
+.c365-stat-icon {
+    position: absolute;
+    inset-inline-end: 1.25rem;
+    inset-block-end: 1.25rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.c365-stat-icon .material-icons {
+    font-size: 1.375rem;
+    color: #fff;
+}
+
+/* ── Dashboard panels ────────────────────────────────────── */
+.c365-dashboard .earning-statistics,
+.c365-dashboard .recent-transactions,
+.c365-dashboard .top-providers,
+.c365-dashboard .recent-activities {
+    height: 100%;
+}
+
+.c365-dashboard .dashboard-chart-card .card-body {
+    padding: 1.25rem 1.25rem 0.5rem;
+}
+
+.c365-dashboard .events .knob {
+    background: var(--c365-green);
+    box-shadow: 0 0 0 3px rgba(46, 173, 111, 0.2);
+}
+
+.c365-dashboard .events .line {
+    background: linear-gradient(180deg, var(--c365-green), var(--c365-border));
+}
+
+/* ── Common lists (booking/provider widgets) ─────────────── */
+.common-list li {
+    padding: 0.75rem;
+    border-radius: var(--c365-radius-sm);
+    transition: background var(--c365-transition);
+    margin-bottom: 0.25rem;
+}
+
+.common-list li:hover {
+    background: var(--bs-primary-light-bg);
+}
+
+.common-list li h5 {
+    font-weight: 600;
+    color: var(--c365-navy);
+    font-size: 0.875rem;
+}
+
+.common-list_rating .material-icons {
+    color: #f5b800;
+    font-size: 1rem;
+}
+
+/* ── Information / detail boxes ──────────────────────────── */
+.information-details-box {
+    border-radius: var(--c365-radius-md);
+    box-shadow: var(--c365-shadow-xs);
+    padding: 1.25rem;
+    background: #fff;
+}
+
+/* ── Data table header row ───────────────────────────────── */
+.data-table-top {
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--c365-border);
+}
+
+.data-table-top h4 {
+    font-size: 1.125rem;
+}
+
+/* ── Pagination ──────────────────────────────────────────── */
+.pagination li a,
+.pagination li span {
+    border-radius: var(--c365-radius-sm) !important;
+    font-weight: 500;
+    min-width: 2.25rem;
+    text-align: center;
+}
+
+.pagination li a.active {
+    border-radius: var(--c365-radius-sm) !important;
+    box-shadow: var(--c365-shadow-xs);
+}
+
+/* ── Modals ──────────────────────────────────────────────── */
+.modal-content {
+    border: none;
+    border-radius: var(--c365-radius-lg);
+    box-shadow: var(--c365-shadow-lg);
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 1.25rem 1.5rem;
+    background: var(--c365-surface);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem 1.25rem;
+    border-top-color: var(--c365-border);
+}
+
+/* ── Dropdowns ───────────────────────────────────────────── */
+.dropdown-menu {
+    border: none;
+    border-radius: var(--c365-radius-md);
+    box-shadow: var(--c365-shadow-md);
+    padding: 0.5rem;
+}
+
+.dropdown-item {
+    border-radius: var(--c365-radius-sm);
+    padding: 0.5rem 0.75rem;
+    font-weight: 500;
+}
+
+/* ── Alerts ──────────────────────────────────────────────── */
+.alert {
+    border: none;
+    border-radius: var(--c365-radius-md);
+    border-inline-start: 4px solid;
+}
+
+/* Info / hint callout boxes (business settings tips) */
+.pick-map.bg-primary.bg-opacity-10,
+.bg-primary.bg-opacity-10 {
+    background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.14);
+}
+
+.pick-map.bg-warning.bg-opacity-10,
+.bg-warning.bg-opacity-10 {
+    background-color: rgba(var(--bs-warning-rgb), 0.12) !important;
+    border: 1px solid rgba(var(--bs-warning-rgb), 0.2);
+}
+
+.pick-map p,
+.pick-map .fz-12 {
+    color: var(--c365-navy);
+    margin-bottom: 0;
+    line-height: 1.5;
+}
+
+/* ── Upload / media cards ──────────────────────────────────── */
+.upload-file__img,
+.landing-image-card {
+    border-radius: var(--c365-radius-md) !important;
+}
+
+/* ── Empty states ────────────────────────────────────────── */
+.c365-empty-state,
+.recent-transaction-no-data {
+    padding: 2rem;
+}
+
+.recent-transaction-no-data p {
+    color: rgba(27, 58, 107, 0.5);
+    margin-top: 0.75rem;
+}
+
+/* ── Settings sidebar ──────────────────────────────────────── */
+.settings-sidebar {
+    border-radius: var(--c365-radius-lg) 0 0 var(--c365-radius-lg);
+    box-shadow: var(--c365-shadow-lg);
+}
+
+.settings-sidebar .setting-box {
+    border-radius: var(--c365-radius-md);
+    transition: var(--c365-transition);
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.footer {
+    margin-top: auto;
+    font-size: 0.8125rem;
+}
+
+/* ── Admin login (Clean 365) ─────────────────────────────── */
+body.c365-admin-login {
+    margin: 0;
+    min-height: 100dvh;
+    background: #eef2f6;
+    font-family: "Plus Jakarta Sans", "IBM Plex Sans Arabic", var(--bs-font-sans-serif);
+    -webkit-font-smoothing: antialiased;
+}
+
+body.c365-admin-login .preloader {
+    z-index: 9999;
+}
+
+/* Legacy split login (provider) — keep until provider page is redesigned */
+body.c365-admin-login:not(:has(.c365-login)) {
+    background: var(--c365-surface);
+    font-family: var(--bs-font-sans-serif);
+}
+
+body.c365-admin-login .login-wrap {
+    min-height: 100dvh;
+}
+
+body.c365-admin-login .login-left {
+    background: linear-gradient(145deg, var(--c365-navy-dark) 0%, var(--c365-navy) 45%, #1e4d85 100%) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+body.c365-admin-login .login-left::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 20% 80%, rgba(46, 173, 111, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 40%);
+    pointer-events: none;
+}
+
+body.c365-admin-login .login-left .tf-box {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--c365-radius-xl);
+    backdrop-filter: blur(8px);
+    position: relative;
+    z-index: 1;
+}
+
+body.c365-admin-login .login-left h2,
+body.c365-admin-login .login-left p {
+    color: #fff !important;
+}
+
+body.c365-admin-login .login-left .c1 {
+    color: var(--c365-green) !important;
+}
+
+body.c365-admin-login .login-logo {
+    max-height: 4rem;
+    filter: brightness(0) invert(1);
+}
+
+body.c365-admin-login .login-right-wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: #fff;
+}
+
+body.c365-admin-login .login-right {
+    max-width: 28rem;
+    margin: 0 auto;
+    width: 100%;
+}
+
+body.c365-admin-login .login-right .badge-primary {
+    background: var(--bs-primary-light-bg) !important;
+    color: var(--c365-navy) !important;
+    border-radius: var(--c365-radius-pill);
+    font-weight: 600;
+}
+
+body.c365-admin-login .login-right-wrap .btn--primary {
+    padding-block: 0.75rem;
+    font-size: 1rem;
+}
+
+body.c365-admin-login .login-footer {
+    border-radius: var(--c365-radius-md);
+    background: var(--c365-navy) !important;
+}
+
+.c365-login {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(24rem, 32rem);
+    min-height: 100dvh;
+    overflow: hidden;
+}
+
+html[dir="rtl"] .c365-login {
+    grid-template-columns: minmax(24rem, 32rem) minmax(0, 1.2fr);
+}
+
+html[dir="rtl"] .c365-login__visual {
+    order: 2;
+}
+
+html[dir="rtl"] .c365-login__panel {
+    order: 1;
+}
+
+.c365-login__visual {
+    position: relative;
+    min-height: 100dvh;
+    overflow: hidden;
+    background: #0b1c33;
+}
+
+.c365-login__photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 40%;
+    transform: scale(1.06);
+    animation: c365-login-ken 20s ease-out forwards;
+}
+
+.c365-login__visual-shade {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(180deg, rgba(8, 20, 40, 0.35) 0%, rgba(8, 20, 40, 0.15) 40%, rgba(8, 20, 40, 0.72) 100%),
+        linear-gradient(90deg, rgba(8, 20, 40, 0.2) 0%, transparent 45%);
+    pointer-events: none;
+}
+
+.c365-login__stars {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        radial-gradient(1.5px 1.5px at 12% 18%, rgba(255, 255, 255, 0.85), transparent),
+        radial-gradient(1px 1px at 28% 8%, rgba(255, 255, 255, 0.7), transparent),
+        radial-gradient(1.5px 1.5px at 44% 22%, rgba(255, 255, 255, 0.55), transparent),
+        radial-gradient(1px 1px at 62% 12%, rgba(255, 255, 255, 0.8), transparent),
+        radial-gradient(1.5px 1.5px at 78% 20%, rgba(255, 255, 255, 0.6), transparent),
+        radial-gradient(1px 1px at 88% 9%, rgba(255, 255, 255, 0.75), transparent);
+    animation: c365-login-twinkle 4.5s ease-in-out infinite alternate;
+    opacity: 0.85;
+}
+
+.c365-login__visual-copy {
+    position: absolute;
+    inset-inline: clamp(1.25rem, 4vw, 3rem);
+    inset-block-end: clamp(1.5rem, 5vh, 3rem);
+    z-index: 1;
+    max-width: 34rem;
+    color: #fff;
+    animation: c365-login-rise 0.95s 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.c365-login__headline {
+    margin: 0 0 0.85rem;
+    font-size: clamp(1.55rem, 2.8vw, 2.45rem);
+    font-weight: 800;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.c365-login__highlight {
+    color: #7dff9a;
+    display: inline-block;
+    animation: c365-login-glow 2.8s ease-in-out infinite;
+}
+
+.c365-login__tagline {
+    margin: 0;
+    max-width: 28rem;
+    font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+    font-weight: 500;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.88);
+    text-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.c365-login__panel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1.5rem, 4vh, 2.75rem) clamp(1.25rem, 3vw, 2.25rem);
+    background:
+        radial-gradient(ellipse 70% 45% at 100% 0%, rgba(46, 173, 111, 0.08), transparent 55%),
+        linear-gradient(180deg, #f4f7fa 0%, #e8eef5 100%);
+    animation: c365-login-panel 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.c365-login__lang {
+    position: absolute;
+    inset-block-start: 1.15rem;
+    inset-inline-end: 1.15rem;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid rgba(27, 58, 107, 0.14);
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--c365-navy);
+    text-decoration: none;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    box-shadow: 0 6px 18px rgba(15, 36, 64, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    animation: c365-login-rise 0.7s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.c365-login__lang:hover {
+    transform: translateY(-1px);
+    background: #fff;
+    box-shadow: 0 10px 22px rgba(15, 36, 64, 0.12);
+    color: var(--c365-navy-dark);
+}
+
+.c365-login__lang-icon {
+    font-size: 1.1rem;
+    color: var(--c365-green);
+}
+
+.c365-login__form {
+    width: 100%;
+    max-width: 24rem;
+    padding: clamp(1.5rem, 3vw, 2rem);
+    border-radius: 22px;
+    background: #fff;
+    border: 1px solid rgba(27, 58, 107, 0.06);
+    box-shadow: 0 18px 50px rgba(15, 36, 64, 0.1);
+    animation: c365-login-card 0.85s 0.12s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.c365-login__brand {
+    margin-bottom: 1.65rem;
+    text-align: center;
+}
+
+.c365-login__logo {
+    display: block;
+    width: auto;
+    height: 5.5rem;
+    max-width: 11rem;
+    margin: 0 auto 1rem;
+    object-fit: contain;
+    animation: c365-login-logo 0.9s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.c365-login__welcome {
+    margin: 0;
+    font-size: clamp(1.45rem, 2.4vw, 1.85rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    color: var(--c365-navy-dark);
+    animation: c365-login-rise 0.75s 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.c365-login__brand-sub {
+    margin: 0.65rem 0 0;
+    font-size: 0.92rem;
+    font-weight: 500;
+    line-height: 1.55;
+    color: rgba(15, 36, 64, 0.62);
+    animation: c365-login-rise 0.75s 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.c365-login__brand-accent {
+    color: var(--c365-green);
+    font-weight: 700;
+}
+
+.c365-login__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 1.05rem;
+    margin-bottom: 1.25rem;
+    animation: c365-login-rise 0.75s 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+body.c365-admin-login .c365-login .ff-field__control {
+    border-radius: 12px;
+    background: #f8fafc;
+    border-color: rgba(27, 58, 107, 0.12);
+    box-shadow: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+body.c365-admin-login .c365-login .ff-field__control:focus-within {
+    background: #fff;
+    border-color: rgba(46, 173, 111, 0.55);
+    box-shadow: 0 0 0 4px rgba(46, 173, 111, 0.12);
+}
+
+body.c365-admin-login .c365-login .ff-field__icon {
+    color: var(--c365-green);
+    opacity: 0.95;
+}
+
+.c365-login__remember .form-check-label {
+    color: rgba(15, 36, 64, 0.72);
+    font-size: 0.9rem;
+}
+
+body.c365-admin-login .c365-login .form-check-input:checked {
+    background-color: var(--c365-navy);
+    border-color: var(--c365-navy);
+}
+
+.c365-login__submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    width: 100%;
+    padding: 0.95rem 1.25rem;
+    border: 0;
+    border-radius: 12px !important;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    background: linear-gradient(135deg, var(--c365-navy) 0%, var(--c365-navy-mid) 100%) !important;
+    box-shadow: 0 12px 28px rgba(27, 58, 107, 0.28);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    animation: c365-login-rise 0.75s 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.c365-login__submit:hover,
+.c365-login__submit:focus-visible {
+    filter: brightness(1.06);
+    transform: translateY(-1px);
+    box-shadow: 0 16px 32px rgba(27, 58, 107, 0.34);
+}
+
+.c365-login__submit:active {
+    transform: translateY(0);
+}
+
+.c365-login__submit-icon {
+    font-size: 1.2rem;
+    transition: transform 0.2s ease;
+}
+
+html[dir="rtl"] .c365-login__submit-icon {
+    transform: scaleX(-1);
+}
+
+.c365-login__submit:hover .c365-login__submit-icon {
+    transform: translateX(3px);
+}
+
+html[dir="rtl"] .c365-login__submit:hover .c365-login__submit-icon {
+    transform: scaleX(-1) translateX(3px);
+}
+
+.c365-login__alt {
+    margin: 1.25rem 0 0;
+    text-align: center;
+    font-size: 0.875rem;
+    color: rgba(15, 36, 64, 0.58);
+    animation: c365-login-rise 0.75s 0.54s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.c365-login__alt a {
+    color: var(--c365-navy);
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(27, 58, 107, 0.25);
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.c365-login__alt a:hover {
+    color: var(--c365-green-dark);
+    border-bottom-color: var(--c365-green);
+}
+
+.c365-login__demo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.35rem;
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    color: #fff;
+    background: linear-gradient(135deg, var(--c365-navy-dark), var(--c365-navy));
+}
+
+.c365-login__demo-copy {
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #fff !important;
+    border: 0;
+    border-radius: 8px;
+    padding: 0.45rem 0.55rem;
+}
+
+.c365-login__demo-creds {
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    opacity: 0.95;
+}
+
+@keyframes c365-login-panel {
+    from { opacity: 0; transform: translateX(18px); }
+    to { opacity: 1; transform: none; }
+}
+
+html[dir="rtl"] .c365-login__panel {
+    animation-name: c365-login-panel-rtl;
+}
+
+@keyframes c365-login-panel-rtl {
+    from { opacity: 0; transform: translateX(-18px); }
+    to { opacity: 1; transform: none; }
+}
+
+@keyframes c365-login-card {
+    from { opacity: 0; transform: translateY(22px) scale(0.98); }
+    to { opacity: 1; transform: none; }
+}
+
+@keyframes c365-login-rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+}
+
+@keyframes c365-login-logo {
+    from { opacity: 0; transform: translateY(10px) scale(0.92); }
+    to { opacity: 1; transform: none; }
+}
+
+@keyframes c365-login-ken {
+    from { transform: scale(1.06); }
+    to { transform: scale(1); }
+}
+
+@keyframes c365-login-twinkle {
+    from { opacity: 0.55; }
+    to { opacity: 0.95; }
+}
+
+@keyframes c365-login-glow {
+    0%, 100% { text-shadow: 0 0 0 rgba(125, 255, 154, 0); }
+    50% { text-shadow: 0 0 18px rgba(125, 255, 154, 0.45); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .c365-login__panel,
+    .c365-login__form,
+    .c365-login__logo,
+    .c365-login__welcome,
+    .c365-login__brand-sub,
+    .c365-login__fields,
+    .c365-login__submit,
+    .c365-login__alt,
+    .c365-login__lang,
+    .c365-login__visual-copy,
+    .c365-login__photo,
+    .c365-login__stars,
+    .c365-login__highlight {
+        animation: none !important;
+        transform: none !important;
+    }
+}
+
+@media only screen and (max-width: 991px) {
+    .c365-login,
+    html[dir="rtl"] .c365-login {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(34vh, 40vh) 1fr;
+    }
+
+    .c365-login__visual,
+    html[dir="rtl"] .c365-login__visual {
+        order: 1;
+        min-height: 34vh;
+    }
+
+    .c365-login__panel,
+    html[dir="rtl"] .c365-login__panel {
+        order: 2;
+        align-items: flex-start;
+        padding-block: 1.5rem 2.25rem;
+        animation-name: c365-login-rise;
+    }
+
+    .c365-login__photo {
+        object-position: center 30%;
+    }
+
+    .c365-login__visual-copy {
+        inset-inline: 1.15rem;
+        inset-block-end: 1.15rem;
+    }
+
+    .c365-login__headline {
+        font-size: 1.25rem;
+    }
+
+    .c365-login__tagline {
+        font-size: 0.9rem;
+    }
+
+    .c365-login__form {
+        max-width: 26rem;
+        margin-inline: auto;
+    }
+}
+
+@media only screen and (max-width: 575px) {
+    .c365-login,
+    html[dir="rtl"] .c365-login {
+        grid-template-rows: minmax(26vh, 30vh) 1fr;
+    }
+
+    .c365-login__visual,
+    html[dir="rtl"] .c365-login__visual {
+        min-height: 26vh;
+    }
+
+    .c365-login__tagline {
+        display: none;
+    }
+
+    .c365-login__logo {
+        height: 4.5rem;
+    }
+
+    .c365-login__form {
+        padding: 1.25rem 1.1rem;
+        border-radius: 18px;
+    }
+
+    .c365-login__lang {
+        inset-block-start: 0.85rem;
+        inset-inline-end: 0.85rem;
+    }
+}
+
+/* ── Avatar polish ───────────────────────────────────────── */
+.avatar-img,
+.avatar img {
+    border: 2px solid var(--c365-border);
+}
+
+/* ── Progress bars ───────────────────────────────────────── */
+.progress {
+    border-radius: var(--c365-radius-pill);
+    height: 0.5rem;
+    background: var(--c365-border);
+}
+
+.progress-bar {
+    border-radius: var(--c365-radius-pill);
+}
+
+/* ── Select2 dropdown ────────────────────────────────────── */
+.select2-dropdown {
+    border: none !important;
+    border-radius: var(--c365-radius-md) !important;
+    box-shadow: var(--c365-shadow-md) !important;
+    overflow: hidden;
+}
+
+/* ── Toastr ──────────────────────────────────────────────── */
+#toast-container > div {
+    border-radius: var(--c365-radius-md);
+    box-shadow: var(--c365-shadow-md);
+}
+
+/* ── Swal buttons inherit pill shape via btn classes ─────── */
+
+/* ── Filter aside / offcanvas ────────────────────────────── */
+.filter-aside,
+.offcanvas {
+    border-radius: var(--c365-radius-lg) 0 0 var(--c365-radius-lg);
+}
+
+/* ── Provider / supervisor panel extras ──────────────────── */
+.c365-analytics-card {
+    border: none !important;
+}
+
+.c365-analytics-card > .card-body {
+    padding: 1.5rem;
+}
+
+.c365-stat-icon--inline {
+    position: static;
+    width: 2.25rem;
+    height: 2.25rem;
+    background: var(--bs-primary-light-bg);
+    backdrop-filter: none;
+}
+
+.c365-stat-icon--inline .material-icons {
+    color: var(--c365-navy);
+    font-size: 1.125rem;
+}
+
+.c365-promo-card {
+    background: linear-gradient(135deg, #1b3a6b 0%, #254a82 55%, #2ead6f 100%) !important;
+    background-image: none !important;
+    border: none !important;
+    border-radius: var(--c365-radius-shell) !important;
+    color: #fff;
+    box-shadow: 0 12px 28px rgba(27, 58, 107, 0.18) !important;
+}
+
+.c365-promo-card .card-body h4,
+.c365-promo-card .card-body p {
+    color: #fff !important;
+}
+
+.c365-promo-card .btn--primary {
+    background: var(--c365-green) !important;
+    box-shadow: 0 4px 14px rgba(46, 173, 111, 0.35);
+}
+
+.c365-promo-card img[width="84"] {
+    opacity: 0.92;
+}
+
+.business-summary:not(.c365-stat-grid .business-summary),
+.statistics-card {
+    border-radius: var(--c365-radius-md) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Dashboard & page chrome — modern SaaS layout
+   ═══════════════════════════════════════════════════════════ */
+
+.c365-page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    margin-bottom: 1.5rem !important;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--c365-border);
+}
+
+.c365-page-header .page-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin-bottom: 0.125rem;
+    color: var(--c365-navy) !important;
+}
+
+.c365-dashboard .c365-stat-grid {
+    margin-bottom: 0.25rem;
+}
+
+.c365-dashboard .c365-stat-grid .business-summary {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 24px rgba(15, 36, 64, 0.14);
+    transition: transform var(--c365-transition), box-shadow var(--c365-transition);
+}
+
+.c365-dashboard .c365-stat-grid .business-summary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 32px rgba(15, 36, 64, 0.18);
+}
+
+.c365-dashboard .earning-statistics,
+.c365-dashboard .recent-transactions,
+.c365-dashboard .top-providers,
+.c365-dashboard .recent-activities {
+    border: 1px solid var(--c365-border) !important;
+}
+
+.c365-dashboard .earning-statistics .card-body > h4,
+.c365-dashboard .recent-transactions h4 {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--c365-navy);
+}
+
+.c365-dashboard .card:hover {
+    transform: none;
+}
+
+.c365-analytics-card {
+    background: #fff;
+    box-shadow: var(--c365-shadow-sm) !important;
+}
+
+.c365-analytics-card h4 {
+    color: var(--c365-navy);
+    font-weight: 700;
+}
+
+/* Sidebar: never inherit main-content link colors */
+.aside .c1,
+.aside .link-color,
+.aside .btn-link {
+    color: inherit !important;
+}
+
+.aside-body .nav > li > a .material-icons {
+    font-size: 1.3125rem;
+    opacity: 0.92;
+}
+
+.aside-body .nav > li > a.active-menu .material-icons {
+    color: var(--c365-green) !important;
+    opacity: 1;
+}
+
+/* Softer table headers in main area only */
+.main-content .table thead th {
+    color: var(--c365-navy);
+    font-weight: 600;
+}
