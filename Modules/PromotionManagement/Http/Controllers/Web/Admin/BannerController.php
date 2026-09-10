@@ -87,7 +87,7 @@ class BannerController extends Controller
             'service_id' => 'required_if:resource_type,service|nullable|uuid',
             'category_id' => 'required_if:resource_type,category|nullable|uuid',
             'resource_type' => 'required|in:service,category,link',
-            'banner_image' => 'required|image|max:'. uploadMaxFileSizeInKB('image') .'|mimes:' . implode(',', array_column(IMAGEEXTENSION, 'key'))
+            'banner_image' => 'required|image|max:' . uploadMaxFileSizeInKB('image') . '|mimes:' . implode(',', array_column(IMAGEEXTENSION, 'key'))
         ]);
 
         $banner = $this->banner;
@@ -144,7 +144,7 @@ class BannerController extends Controller
             'resource_type' => 'required|in:service,category,link',
             'service_id' => 'required_if:resource_type,service|nullable|uuid',
             'category_id' => 'required_if:resource_type,category|nullable|uuid',
-            'banner_image' => 'image|max:'. uploadMaxFileSizeInKB('image') .'|mimes:' . implode(',', array_column(IMAGEEXTENSION, 'key'))
+            'banner_image' => 'image|max:' . uploadMaxFileSizeInKB('image') . '|mimes:' . implode(',', array_column(IMAGEEXTENSION, 'key'))
         ]);
 
         $banner = $this->banner->where(['id' => $id])->first();
@@ -225,7 +225,8 @@ class BannerController extends Controller
                 translate('SL') => $key + 1,
                 translate('Title') => $item->banner_title,
                 translate('Type') => $item->resource_type,
-                translate('Status') => $item->is_active ? translate('active') : translate('Inactive')];
+                translate('Status') => $item->is_active ? translate('active') : translate('Inactive')
+            ];
         });
 
         $fileName = 'promotional_banners_' . date('Y_m_d') . '.xlsx';

@@ -1,6 +1,6 @@
 @extends('adminmodule::layouts.master')
 
-@section('title', translate('تعديل خدمة إضافية'))
+@section('title', translate('Edit Additional Service'))
 
 @push('css_or_js')
     <style>
@@ -16,9 +16,9 @@
             <div class="row">
                 <div class="col-12">
                     <div class="page-title-wrap mb-3 d-flex align-items-center justify-content-between">
-                        <h2 class="page-title">{{ translate('تعديل الخدمة الإضافية') }}</h2>
+                        <h2 class="page-title">{{ translate('Edit Additional Service') }}</h2>
                         <a href="{{ route('admin.additional-service.index') }}" class="btn btn--primary">
-                            <span class="material-icons">arrow_back</span> {{ translate('العودة للقائمة') }}
+                            <span class="material-icons">arrow_back</span> {{ translate('Back to List') }}
                         </a>
                     </div>
 
@@ -152,22 +152,22 @@
 
             $('#add-feature-btn').on('click', function () {
                 var newRow = `
-                                    <div class="row g-2 align-items-center mb-2 feature-row-input">
-                                        <div class="col-md-5">
-                                            <textarea name="feature_titles[${rowIndex}]" class="form-control" rows="2" placeholder="{{ translate('اسم الميزة (أضف أسطر جديدة لإضافة أكثر من ميزة)') }}"></textarea>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <input type="number" step="0.01" name="feature_prices[${rowIndex}]" class="form-control" placeholder="{{ translate('السعر (اختياري)') }}" min="0">
-                                        </div>
-                                        <div class="col-md-3">
-                                            <input type="file" name="feature_icons[${rowIndex}]" class="form-control" accept="image/*">
-                                        </div>
-                                        <div class="col-md-1 text-end">
-                                            <button type="button" class="btn btn-outline-danger btn-sm remove-feature-btn" style="min-width: 38px; height: 38px;">
-                                                <span class="material-icons">delete</span>
-                                            </button>
-                                        </div>
-                                    </div>`;
+                                        <div class="row g-2 align-items-center mb-2 feature-row-input">
+                                            <div class="col-md-5">
+                                                <textarea name="feature_titles[${rowIndex}]" class="form-control" rows="2" placeholder="{{ translate('اسم الميزة (أضف أسطر جديدة لإضافة أكثر من ميزة)') }}"></textarea>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <input type="number" step="0.01" name="feature_prices[${rowIndex}]" class="form-control" placeholder="{{ translate('السعر (اختياري)') }}" min="0">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <input type="file" name="feature_icons[${rowIndex}]" class="form-control" accept="image/*">
+                                            </div>
+                                            <div class="col-md-1 text-end">
+                                                <button type="button" class="btn btn-outline-danger btn-sm remove-feature-btn" style="min-width: 38px; height: 38px;">
+                                                    <span class="material-icons">delete</span>
+                                                </button>
+                                            </div>
+                                        </div>`;
                 $('#features-wrapper').append(newRow);
                 rowIndex++;
             });

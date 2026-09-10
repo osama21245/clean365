@@ -65,12 +65,11 @@ trait BookingTrait
 
             $booking = new Booking();
 
-            DB::transaction(function () use ($subCategory, $booking, $transactionId, $request, $cartData, $isGuest, $isPartials, $customerWalletBalance,
-                &$userId, // Pass by reference
+            DB::transaction(function () use ($subCategory, $booking, $transactionId, $request, $cartData, $isGuest, $isPartials, $customerWalletBalance, &$userId, // Pass by reference
                 &$loginToken, // Pass by reference,
                 $newUserInfo) {
 
-                if ($newUserInfo != null){
+                if ($newUserInfo != null) {
                     $response = $this->registerUserFromCheckoutPage($newUserInfo);
 
                     $user = $response['user'];
@@ -119,7 +118,7 @@ trait BookingTrait
                 $booking->coupon_code = $cartData->first()->coupon_code;
                 $booking->service_schedule = date('Y-m-d H:i:s', strtotime($request['service_schedule'])) ?? now()->addHours(5);
                 $booking->service_address_id = $request['service_address_id'] ?? '';
-                                $booking->is_guest = $isGuest;
+                $booking->is_guest = $isGuest;
                 $booking->extra_fee = $extraFee;
                 $booking->total_referral_discount_amount = $referralDiscount;
                 $booking->service_address_location = json_encode(UserAddress::find($request['service_address_id'])) ?? null;
@@ -213,13 +212,13 @@ trait BookingTrait
 
                 if ($bookingNotification && $bookingNotificationType == 'firebase') {
                     try {
-                        $serviceAtProviderPlace = (int)(business_config('service_at_provider_place', 'provider_config')->live_values ?? 0);
+                        $serviceAtProviderPlace = (int) (business_config('service_at_provider_place', 'provider_config')->live_values ?? 0);
                         $serviceLocation = $booking->service_location;
                         $zoneId = $booking->zone_id;
 
-                        if (isset($booking->provider_id)){
+                        if (isset($booking->provider_id)) {
                             $topic = "clean365_provider_{$zoneId}_{$booking->provider_id}_booking_message";
-                        }else {
+                        } else {
                             if ($serviceAtProviderPlace) {
                                 if ($serviceLocation === 'provider') {
                                     $topic = "clean365_provider_{$zoneId}_provider_booking_message";
@@ -248,7 +247,7 @@ trait BookingTrait
                                 $notification = isNotificationActive($provider?->id, 'booking', 'notification', 'provider');
                                 $title = get_push_notification_message('booking_accepted', 'provider_notification', $languageKey);
                                 if ($title && sendDeviceNotificationPermission($booking?->provider_id) && $notification) {
-                                        device_notification($fcmToken, $title, null, null, $booking->id, 'booking');
+                                    device_notification($fcmToken, $title, null, null, $booking->id, 'booking');
                                 }
                             }
                         } else {
@@ -265,14 +264,14 @@ trait BookingTrait
                                 $title = get_push_notification_message('new_service_request_arrived', 'provider_notification', optional($provider->owner)->current_language_key);
 
                                 if (!is_null($fcmToken) && $provider->service_availability && $title && $notification && isset($bookingNotificationStatus) && $bookingNotificationStatus['push_notification_booking'] && sendDeviceNotificationPermission($provider->id)) {
-                                    $serviceAtProviderPlace = (int)((business_config('service_at_provider_place', 'provider_config'))->live_values ?? 0);
+                                    $serviceAtProviderPlace = (int) ((business_config('service_at_provider_place', 'provider_config'))->live_values ?? 0);
                                     $serviceLocations = getProviderSettings(providerId: $provider->id, key: 'service_location', type: 'provider_config') ?? ['customer'];
 
-                                    if ($serviceAtProviderPlace == 1){
-                                        if (in_array($booking->service_location, $serviceLocations)){
+                                    if ($serviceAtProviderPlace == 1) {
+                                        if (in_array($booking->service_location, $serviceLocations)) {
                                             device_notification($fcmToken, $title, null, null, $booking->id, 'booking');
                                         }
-                                    }else{
+                                    } else {
                                         device_notification($fcmToken, $title, null, null, $booking->id, 'booking');
                                     }
 
@@ -304,14 +303,14 @@ trait BookingTrait
                             $title = get_push_notification_message('new_service_request_arrived', 'provider_notification', $provider?->owner?->current_language_key);
 
                             if (!is_null($fcmToken) && $provider?->service_availability && $title && isset($bookingNotificationStatus) && $bookingNotificationStatus['push_notification_booking'] && sendDeviceNotificationPermission($booking?->provider_id)) {
-                                $serviceAtProviderPlace = (int)((business_config('service_at_provider_place', 'provider_config'))->live_values ?? 0);
+                                $serviceAtProviderPlace = (int) ((business_config('service_at_provider_place', 'provider_config'))->live_values ?? 0);
                                 $serviceLocations = getProviderSettings(providerId: $provider->id, key: 'service_location', type: 'provider_config') ?? ['customer'];
 
-                                if ($serviceAtProviderPlace == 1){
-                                    if (in_array($booking->service_location, $serviceLocations)){
+                                if ($serviceAtProviderPlace == 1) {
+                                    if (in_array($booking->service_location, $serviceLocations)) {
                                         device_notification($fcmToken, $title, null, null, $booking->id, 'booking');
                                     }
-                                }else{
+                                } else {
                                     device_notification($fcmToken, $title, null, null, $booking->id, 'booking');
                                 }
                             }
@@ -325,11 +324,18 @@ trait BookingTrait
         cart_clean($oldUserId);
         event(new BookingRequested($booking));
 
+        $serviceAddress = UserAddress::find($booking->service_address_id)
+            ?? $booking->service_address
+            ?? (is_string($booking->service_address_location) ? json_decode($booking->service_address_location) : $booking->service_address_location);
+
         return [
             'flag' => 'success',
             'booking_id' => $bookingIds,
             'readable_id' => $booking->readable_id,
-            'token' => $loginToken];
+            'token' => $loginToken,
+            'address' => $serviceAddress,
+            'service_address' => $serviceAddress
+        ];
     }
     public function placeRepeatBookingRequest($userId, $request, $transactionId, $newUserInfo = null, int $isGuest = 0): array
     {
@@ -347,12 +353,11 @@ trait BookingTrait
 
             $booking = new Booking();
 
-            DB::transaction(function () use ($subCategory, $booking, $transactionId, $request, $cartData, $isGuest,
-                &$userId, // Pass by reference
+            DB::transaction(function () use ($subCategory, $booking, $transactionId, $request, $cartData, $isGuest, &$userId, // Pass by reference
                 &$loginToken, // Pass by reference,
-                $newUserInfo)  {
+                $newUserInfo) {
 
-                if ($newUserInfo != null){
+                if ($newUserInfo != null) {
                     $response = $this->registerUserFromCheckoutPage($newUserInfo);
 
                     $user = $response['user'];
@@ -401,9 +406,9 @@ trait BookingTrait
 
                 $maxCouponUsagePerUser = max(0, $coupon?->discount?->limit_per_user - $totalUsedCount);
                 $totalDiscount = 0;
-                if ($maxCouponUsagePerUser >= $totalDate){
+                if ($maxCouponUsagePerUser >= $totalDate) {
                     $totalDiscount = $cartData->sum('coupon_discount') * $totalDate;
-                }else{
+                } else {
                     $totalDiscount = $cartData->sum('coupon_discount') * $maxCouponUsagePerUser;
                 }
 
@@ -474,7 +479,7 @@ trait BookingTrait
                     }
                     $repeatBooking->extra_fee = $index < 1 ? $extraFee : 0;
                     $repeatBooking->total_referral_discount_amount = $index < 1 ? $referralDiscount : 0;
-                                        $repeatBooking->readable_id = $booking->readable_id . '-' . $suffix;
+                    $repeatBooking->readable_id = $booking->readable_id . '-' . $suffix;
                     $repeatBooking->service_address_location = $serviceAddress;
                     $repeatBooking->service_location = $request->service_location;
                     $repeatBooking->save();
@@ -522,7 +527,7 @@ trait BookingTrait
                         if ($index <= $maxCouponUsagePerUser && $coupon) {
                             $bookingDetailsAmount->coupon_discount_by_admin = $this->calculate_coupon_cost($datum['coupon_discount'])['admin'];
                             $bookingDetailsAmount->coupon_discount_by_provider = $this->calculate_coupon_cost($datum['coupon_discount'])['provider'];
-                        }else{
+                        } else {
                             $bookingDetailsAmount->coupon_discount_by_admin = 0;
                             $bookingDetailsAmount->coupon_discount_by_provider = 0;
                         }
@@ -539,13 +544,13 @@ trait BookingTrait
                 $bookingNotificationType = (business_config('booking_notification_type', 'business_information'))?->live_values;
                 if ($bookingNotification && $bookingNotificationType == 'firebase') {
                     try {
-                        $serviceAtProviderPlace = (int)(business_config('service_at_provider_place', 'provider_config')->live_values ?? 0);
+                        $serviceAtProviderPlace = (int) (business_config('service_at_provider_place', 'provider_config')->live_values ?? 0);
                         $serviceLocation = $booking->service_location;
                         $zoneId = $booking->zone_id;
 
-                        if (isset($booking->provider_id)){
+                        if (isset($booking->provider_id)) {
                             $topic = "clean365_provider_{$zoneId}_{$booking->provider_id}_booking_message";
-                        }else {
+                        } else {
                             if ($serviceAtProviderPlace) {
                                 if ($serviceLocation === 'provider') {
                                     $topic = "clean365_provider_{$zoneId}_provider_booking_message";
@@ -575,7 +580,7 @@ trait BookingTrait
                                 $notification = isNotificationActive($provider?->id, 'booking', 'notification', 'provider');
                                 $title = get_push_notification_message('booking_accepted', 'provider_notification', $languageKey);
                                 if ($title && sendDeviceNotificationPermission($booking?->provider_id) && $notification) {
-                                        device_notification($fcmToken, $title, null, null, $booking->id, 'booking', null, null, null, null, $repeatOrRegular);
+                                    device_notification($fcmToken, $title, null, null, $booking->id, 'booking', null, null, null, null, $repeatOrRegular);
                                 }
                             }
                         } else {
@@ -607,11 +612,18 @@ trait BookingTrait
         cart_clean($oldUserId);
         event(new BookingRequested($booking));
 
+        $serviceAddress = UserAddress::find($booking->service_address_id)
+            ?? $booking->service_address
+            ?? (is_string($booking->service_address_location) ? json_decode($booking->service_address_location) : $booking->service_address_location);
+
         return [
             'flag' => 'success',
             'booking_id' => $bookingIds,
             'readable_id' => $booking->readable_id,
-            'token' => $loginToken];
+            'token' => $loginToken,
+            'address' => $serviceAddress,
+            'service_address' => $serviceAddress
+        ];
     }
 
     function getSuffix($index): string
@@ -687,7 +699,7 @@ trait BookingTrait
             $booking->total_coupon_discount_amount = 0;
             $booking->service_schedule = date('Y-m-d H:i:s', strtotime($data['service_schedule'])) ?? now()->addHours(5);
             $booking->service_address_id = $data['service_address_id'] ?? '';
-                        $booking->is_guest = 0;
+            $booking->is_guest = 0;
             $booking->extra_fee = $extraFee;
             $booking->total_referral_discount_amount = $referralDiscount;
             $booking->save();
@@ -768,20 +780,27 @@ trait BookingTrait
 
             $provider = Provider::with('owner')->whereId($booking->provider_id)->first();
             $languageKey = $provider->owner?->current_language_key;
-           if (!is_null($provider?->owner?->fcm_token) && $provider?->is_suspended == 0) {
-               $title = get_push_notification_message('booking_accepted', 'provider_notification', $languageKey);
-               $bookingNotificationStatus = business_config('booking', 'notification_settings')->live_values;
+            if (!is_null($provider?->owner?->fcm_token) && $provider?->is_suspended == 0) {
+                $title = get_push_notification_message('booking_accepted', 'provider_notification', $languageKey);
+                $bookingNotificationStatus = business_config('booking', 'notification_settings')->live_values;
 
-               if ($title && isset($bookingNotificationStatus) && $bookingNotificationStatus['push_notification_booking']) {
-                   device_notification($provider->owner->fcm_token, $title, null, null, $booking->id, 'booking');
-               }
-           }
+                if ($title && isset($bookingNotificationStatus) && $bookingNotificationStatus['push_notification_booking']) {
+                    device_notification($provider->owner->fcm_token, $title, null, null, $booking->id, 'booking');
+                }
+            }
         });
+
+        $serviceAddress = UserAddress::find($booking->service_address_id)
+            ?? $booking->service_address
+            ?? (is_string($booking->service_address_location) ? json_decode($booking->service_address_location) : $booking->service_address_location);
 
         return [
             'flag' => 'success',
             'booking_id' => $booking->id,
-            'readable_id' => $booking->readable_id];
+            'readable_id' => $booking->readable_id,
+            'address' => $serviceAddress,
+            'service_address' => $serviceAddress
+        ];
     }
 
 
@@ -829,7 +848,8 @@ trait BookingTrait
             $booking->save();
 
             $detail = BookingDetail::where('booking_id', $booking->id)->where('variant_key', $request['variant_key'])->first();
-            if (!$detail) $detail = new BookingDetail();
+            if (!$detail)
+                $detail = new BookingDetail();
             $detail->booking_id = $booking->id;
             $detail->service_id = $request['service_id'];
             $detail->service_name = $service->name ?? 'service-not-found';
@@ -844,7 +864,8 @@ trait BookingTrait
             $detail->save();
 
             $bookingDetailsAmount = BookingDetailsAmount::where('booking_id', $booking->id)->where('booking_details_id', $detail->id)->first();
-            if (!$bookingDetailsAmount) $bookingDetailsAmount = new BookingDetailsAmount();
+            if (!$bookingDetailsAmount)
+                $bookingDetailsAmount = new BookingDetailsAmount();
             $bookingDetailsAmount->booking_details_id = $detail->id;
             $bookingDetailsAmount->booking_id = $booking->id;
             $bookingDetailsAmount->service_unit_cost += $detail['service_cost'];
@@ -918,7 +939,8 @@ trait BookingTrait
 
     protected function increase_service_quantity_from_booking($request): void
     {
-        if (!$request->has('booking_id', 'service_id', 'variant_key', 'zone_id')) return;
+        if (!$request->has('booking_id', 'service_id', 'variant_key', 'zone_id'))
+            return;
 
         DB::transaction(function () use ($request) {
             $bookingDetails = BookingDetail::whereHas('booking', fn($query) => $query->where('id', $request['booking_id']))->where('variant_key', $request['variant_key'])->first();
@@ -1051,7 +1073,8 @@ trait BookingTrait
     }
     protected function increase_service_quantity_from_booking_repeat($request): void
     {
-        if (!$request->has('booking_repeat_id', 'service_id', 'variant_key', 'zone_id')) return;
+        if (!$request->has('booking_repeat_id', 'service_id', 'variant_key', 'zone_id'))
+            return;
         DB::transaction(function () use ($request) {
             $bookingDetails = BookingRepeatDetails::whereHas('repeat', fn($query) => $query->where('id', $request['booking_repeat_id']))->where('variant_key', $request['variant_key'])->first();
             $service = Service::with('variations')->find($request['service_id']);
@@ -1184,7 +1207,8 @@ trait BookingTrait
 
     protected function remove_service_from_booking($request): void
     {
-        if (!$request->has('booking_id', 'service_id', 'variant_key', 'zone_id')) return;
+        if (!$request->has('booking_id', 'service_id', 'variant_key', 'zone_id'))
+            return;
 
         DB::transaction(function () use ($request) {
             $bookingDetails = BookingDetail::whereHas('booking', fn($query) => $query->where('id', $request['booking_id']))->where('variant_key', $request['variant_key'])->first();
@@ -1293,7 +1317,8 @@ trait BookingTrait
 
     protected function decrease_service_quantity_from_booking($request): void
     {
-        if (!$request->has('booking_id', 'service_id', 'variant_key', 'zone_id')) return;
+        if (!$request->has('booking_id', 'service_id', 'variant_key', 'zone_id'))
+            return;
 
         DB::transaction(function () use ($request) {
             $bookingDetails = BookingDetail::whereHas('booking', fn($query) => $query->where('id', $request['booking_id']))->where('variant_key', $request['variant_key'])->first();
@@ -1435,7 +1460,8 @@ trait BookingTrait
     }
     protected function decrease_service_quantity_from_booking_repeat($request): void
     {
-        if (!$request->has('booking_repeat_id', 'service_id', 'variant_key', 'zone_id')) return;
+        if (!$request->has('booking_repeat_id', 'service_id', 'variant_key', 'zone_id'))
+            return;
 
         DB::transaction(function () use ($request) {
             $bookingDetails = BookingRepeatDetails::whereHas('repeat', fn($query) => $query->where('id', $request['booking_repeat_id']))->where('variant_key', $request['variant_key'])->first();
@@ -1635,7 +1661,8 @@ trait BookingTrait
     private function calculate_discount_cost(float $discount_amount): array
     {
         $data = BusinessSettings::where('settings_type', 'promotional_setup')->where('key_name', 'discount_cost_bearer')->first();
-        if (!isset($data)) return [];
+        if (!isset($data))
+            return [];
         $data = $data->live_values;
 
         if ($data['admin_percentage'] == 0) {
@@ -1662,7 +1689,8 @@ trait BookingTrait
     private function calculate_campaign_cost(float $campaignAmount): array
     {
         $data = BusinessSettings::where('settings_type', 'promotional_setup')->where('key_name', 'campaign_cost_bearer')->first();
-        if (!isset($data)) return [];
+        if (!isset($data))
+            return [];
         $data = $data->live_values;
 
         if ($data['admin_percentage'] == 0) {
@@ -1690,7 +1718,8 @@ trait BookingTrait
     private function calculate_coupon_cost(float $couponAmount): array
     {
         $data = BusinessSettings::where('settings_type', 'promotional_setup')->where('key_name', 'coupon_cost_bearer')->first();
-        if (!isset($data)) return [];
+        if (!isset($data))
+            return [];
         $data = $data->live_values;
 
         if ($data['admin_percentage'] == 0) {
@@ -1726,9 +1755,9 @@ trait BookingTrait
 
         $bookingAmountWithoutCommission = $booking['total_booking_amount'] - $adminCommissionWithoutCost;
 
-        if (isset($booking->booking_id)){
+        if (isset($booking->booking_id)) {
             $bookingAmountDetailAmount = BookingDetailsAmount::where('booking_repeat_id', $booking->id)->first();
-        }else{
+        } else {
             $bookingAmountDetailAmount = BookingDetailsAmount::where('booking_id', $booking->id)->first();
         }
 
@@ -1749,10 +1778,11 @@ trait BookingTrait
         }
 
         $bookingType = SubscriptionBookingType::where('booking_id', $bookingId)->where('type', 'subscription')->first();
-        if($bookingType){
+        if ($bookingType) {
             return [
                 'adminCommission' => 0,
-                'adminCommissionWithoutCost' => 0];
+                'adminCommissionWithoutCost' => 0
+            ];
         }
 
         $serviceCost = $booking['total_booking_amount'] - $booking['total_tax_amount'] + $booking['total_discount_amount'] + $booking['total_campaign_discount_amount'] + $booking['total_coupon_discount_amount'] - $booking['extra_fee'];
@@ -1774,7 +1804,8 @@ trait BookingTrait
 
         return [
             'adminCommission' => $adminCommission,
-            'adminCommissionWithoutCost' => $adminCommissionWithoutCost];
+            'adminCommissionWithoutCost' => $adminCommissionWithoutCost
+        ];
     }
 
 
@@ -1788,17 +1819,19 @@ trait BookingTrait
     private function referral_earning_calculation($userId, $zoneId)
     {
         $isFirstBooking = Booking::where('customer_id', $userId)->count('id');
-        if ($isFirstBooking > 1) return false;
+        if ($isFirstBooking > 1)
+            return false;
 
         $referredByUser = User::find($userId)->referred_by_user ?? null;
-        if (is_null($referredByUser)) return false;
+        if (is_null($referredByUser))
+            return false;
 
         $customerReferralEarning = business_config('customer_referral_earning', 'customer_config')->live_values ?? 0;
         $amount = business_config('referral_value_per_currency_unit', 'customer_config')->live_values ?? 0;
 
         if ($customerReferralEarning == 1) {
             referralEarningTransactionAfterBookingComplete($referredByUser, $amount);
-            $userRefund  = isNotificationActive(null, 'refer_earn', 'notification', 'user');
+            $userRefund = isNotificationActive(null, 'refer_earn', 'notification', 'user');
             $title = with_currency_symbol($amount) . ' ' . get_push_notification_message('referral_earning', 'customer_notification', $referredByUser?->current_language_key);
             if ($title && $referredByUser?->fcm_token && $userRefund) {
                 device_notification($referredByUser?->fcm_token, $title, null, null, null, 'general', null, $referredByUser?->id);
@@ -1830,10 +1863,12 @@ trait BookingTrait
     private function referralEarningCalculationForFirstBooking($userId, $totalAmount, $zoneId)
     {
         $isFirstBooking = Booking::where('customer_id', $userId)->count('id');
-        if ($isFirstBooking > 0) return 0;
+        if ($isFirstBooking > 0)
+            return 0;
 
         $referredByUser = User::find($userId)->referred_by_user ?? null;
-        if (is_null($referredByUser)) return 0;
+        if (is_null($referredByUser))
+            return 0;
 
         $newUserDiscount = business_config('referral_based_new_user_discount', 'customer_config')->live_values ?? 0;
         $discountType = business_config('referral_discount_type', 'customer_config')->live_values ?? 0;
@@ -1863,8 +1898,8 @@ trait BookingTrait
                     $amount = ($discount / 100) * $bookingAmount;
                 }
 
-                if ($amount > 0){
-                    $userRefund  = isNotificationActive(null, 'refer_earn', 'notification', 'user');
+                if ($amount > 0) {
+                    $userRefund = isNotificationActive(null, 'refer_earn', 'notification', 'user');
                     $title = with_currency_symbol($amount) . ' ' . get_push_notification_message('referral_earning_first_booking', 'customer_notification', $user?->current_language_key);
                     if ($title && $user->fcm_token && $userRefund) {
                         device_notification($user->fcm_token, $title, null, null, null, 'general', null, $user->id);
@@ -1905,12 +1940,13 @@ trait BookingTrait
     {
 
         $customerLoyaltyPoint = business_config('customer_loyalty_point', 'customer_config');
-        if (isset($customerLoyaltyPoint) && $customerLoyaltyPoint->live_values != '1') return false;
+        if (isset($customerLoyaltyPoint) && $customerLoyaltyPoint->live_values != '1')
+            return false;
 
         $percentagePerBooking = business_config('loyalty_point_percentage_per_booking', 'customer_config');
         $pointAmount = ($percentagePerBooking->live_values * $bookingAmount) / 100;
 
-       // $pointPerCurrencyUnit = business_config('loyalty_point_value_per_currency_unit', 'customer_config');
+        // $pointPerCurrencyUnit = business_config('loyalty_point_value_per_currency_unit', 'customer_config');
 
         //$point = $pointPerCurrencyUnit->live_values * $pointAmount;
 
@@ -1921,7 +1957,8 @@ trait BookingTrait
 
         $customerNotification = isNotificationActive(null, 'loyality_point', 'notification', 'user');
         $dataInfo = [
-            'user_name' => $user?->first_name . ' ' . $user?->last_name];
+            'user_name' => $user?->first_name . ' ' . $user?->last_name
+        ];
         if ($title && $user && $user->is_active && $user->fcm_token && $customerNotification) {
             device_notification($user->fcm_token, $title, null, null, null, 'loyalty_point', null, $user->id, $dataInfo);
         }
@@ -1959,7 +1996,8 @@ trait BookingTrait
 
         return [
             'user' => $user,
-            'loginToken' => $loginToken];
+            'loginToken' => $loginToken
+        ];
     }
 
 }

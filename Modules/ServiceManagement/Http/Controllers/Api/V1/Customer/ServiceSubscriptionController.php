@@ -249,9 +249,18 @@ class ServiceSubscriptionController extends Controller
             ]), 200);
         }
 
+        $booking = $result['booking'] ?? null;
+        if ($booking) {
+            $booking->loadMissing('service_address');
+        }
+        $address = $booking?->service_address
+            ?? (is_string($booking?->service_address_location) ? json_decode($booking->service_address_location) : $booking?->service_address_location);
+
         $content = [
-            'booking' => $result['booking'],
-            'subscription' => $result['subscription']
+            'booking' => $booking,
+            'subscription' => $result['subscription'],
+            'address' => $address,
+            'service_address' => $address
         ];
 
         if (!empty($result['payment_url'])) {
@@ -320,9 +329,18 @@ class ServiceSubscriptionController extends Controller
             ]), 200);
         }
 
+        $booking = $result['booking'] ?? null;
+        if ($booking) {
+            $booking->loadMissing('service_address');
+        }
+        $address = $booking?->service_address
+            ?? (is_string($booking?->service_address_location) ? json_decode($booking->service_address_location) : $booking?->service_address_location);
+
         $content = [
-            'booking' => $result['booking'],
-            'subscription' => $result['subscription']
+            'booking' => $booking,
+            'subscription' => $result['subscription'],
+            'address' => $address,
+            'service_address' => $address
         ];
 
         if (!empty($result['payment_url'])) {
@@ -434,9 +452,18 @@ class ServiceSubscriptionController extends Controller
             ]), 200);
         }
 
+        $booking = $result['booking'] ?? null;
+        if ($booking) {
+            $booking->loadMissing('service_address');
+        }
+        $address = $booking?->service_address
+            ?? (is_string($booking?->service_address_location) ? json_decode($booking->service_address_location) : $booking?->service_address_location);
+
         $content = [
-            'booking' => $result['booking'],
-            'subscription' => $result['subscription']
+            'booking' => $booking,
+            'subscription' => $result['subscription'],
+            'address' => $address,
+            'service_address' => $address
         ];
 
         if (!empty($result['payment_url'])) {

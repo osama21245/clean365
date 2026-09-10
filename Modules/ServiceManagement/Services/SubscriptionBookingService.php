@@ -60,7 +60,40 @@ class SubscriptionBookingService
             ?? $oldBooking->service_address?->property_id;
 
         if (!$propertyId) {
-            return ['flag' => 'failed', 'message' => 'property_id required'];
+            $activeSub = CustomerServiceSubscription::where('user_id', $userId)
+                ->where('service_id', $mainDetail->service_id)
+                ->where('status', 'active')
+                ->where('remaining_visits', '>', 0)
+                ->first();
+            if ($activeSub && $activeSub->property_id) {
+                $propertyId = $activeSub->property_id;
+            }
+        }
+
+        if (!$propertyId) {
+            $userAddr = UserAddress::where('user_id', $userId)->whereNotNull('property_id')->first();
+            if ($userAddr) {
+                $propertyId = $userAddr->property_id;
+            }
+        }
+
+        if (!$propertyId) {
+            $serviceModel = Service::withoutGlobalScopes()->where('id', $mainDetail->service_id)->first();
+            if ($serviceModel && $serviceModel->property_id) {
+                $propertyId = $serviceModel->property_id;
+            }
+        }
+
+        if (!$propertyId) {
+            $propertyId = Property::where('is_active', 1)->value('id');
+        }
+
+        $serviceAddressId = $payload['service_address_id']
+            ?? $payload['address_id']
+            ?? $oldBooking->service_address_id;
+
+        if (!$serviceAddressId) {
+            $serviceAddressId = UserAddress::where('user_id', $userId)->value('id');
         }
 
         $addonIds = $payload['addon_service_ids']
@@ -78,7 +111,7 @@ class SubscriptionBookingService
         return $this->confirm($userId, [
             'service_id' => $mainDetail->service_id,
             'property_id' => $propertyId,
-            'service_address_id' => $payload['service_address_id'] ?? $payload['address_id'] ?? $oldBooking->service_address_id,
+            'service_address_id' => $serviceAddressId,
             'service_schedule' => $payload['service_schedule'],
             'zone_id' => $payload['zone_id'] ?? $oldBooking->zone_id,
             'payment_method' => $payload['payment_method'] ?? $oldBooking->payment_method ?? 'cash_after_service',
@@ -295,7 +328,7 @@ class SubscriptionBookingService
                 $booking->coupon_code = $lineItems[0]['coupon_code'] ?? null;
                 $booking->service_schedule = date('Y-m-d H:i:s', strtotime($payload['service_schedule']));
                 $booking->service_address_id = $address->id;
-                                $booking->is_guest = 0;
+                $booking->is_guest = 0;
                 $booking->extra_fee = $extraFee;
                 $booking->total_referral_discount_amount = 0;
                 $booking->service_address_location = json_encode($address);
@@ -358,15 +391,17 @@ class SubscriptionBookingService
                     placeBookingTransactionForWalletPayment($booking);
                 }
 
-                $subscription = CustomerServiceSubscription::query()
-                    ->where([
-                        'user_id' => $userId,
-                        'service_id' => $service->id,
-                        'property_id' => $payload['property_id'],
-                        'status' => 'active'
-                    ])
-                    ->lockForUpdate()
-                    ->first();
+                $subQuery = CustomerServiceSubscription::query()
+                    ->where('user_id', $userId)
+                    ->where('service_id', $service->id)
+                    ->where('status', 'active');
+                if (!empty($payload['property_id'])) {
+                    $subQuery->where(function ($q) use ($payload) {
+                        $q->where('property_id', $payload['property_id'])
+                            ->orWhereNull('property_id');
+                    });
+                }
+                $subscription = $subQuery->lockForUpdate()->first();
 
                 if (!$subscription) {
                     $visits = max(1, (int) $service->visits_count);
